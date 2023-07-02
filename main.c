@@ -4,23 +4,22 @@
 #define FALSE 0;
 #define TRUE 1;
 
-char input[1000];
+char input[2000];
 long code[1024];
 char opcode[16][4] = {
-   "mov","cmp","add","sub","not","clr","lea","inc","dec","jmp","bne","red","prn","jsr","rts","stop"
-};
+    "mov", "cmp", "add", "sub", "not", "clr", "lea", "inc", "dec", "jmp", "bne", "red", "prn", "jsr", "rts", "stop"};
 
-int isWordMatch(int i,char word[])
+int isWordMatch(int i, char word[])
 {
    int index;
-   for(index = 0;index < strlen(word);index++)
+   for (index = 0; index < strlen(word); index++)
    {
-      if(input[i] != word[index])
+      if (input[i] != word[index])
       {
          return FALSE;
       }
 
-      if(index == strlen(word))
+      if (index == strlen(word))
       {
          return TRUE;
       }
@@ -32,46 +31,72 @@ int isWordMatch(int i,char word[])
 int isOpCode(int i)
 {
    int x;
-   for(x = 0;x < strlen(opcode);x++)
+   for (x = 0; x < sizeof(opcode); x++)
    {
-     if(isWordMatch(i,opcode[x]) == 1)
-     {
-      return TRUE;
-     }
+      if (isWordMatch(i, opcode[x]) == 1)
+      {
+         return x;
+      }
    }
 
-   return FALSE;
+   return -1;
 }
 
 int isRegister(int i)
 {
    int x;
-   for(x = 1;x <= 8;x++)
+   for (x = 1; x <= 8; x++)
    {
-     if(isWordMatch(i,("@r" + x))== 1)
-     {
-      return TRUE;
-     }
+      if (isWordMatch(i, ("@r" + x)) == 1)
+      {
+         return TRUE;
+      }
    }
 
    return FALSE;
 }
 
-
-int main() {
-   scanf("%s",input);
-
-   long i = 0;
-   while(i < strlen(input))
+int jumpToNextWord(int i)
+{
+   while (input[i] == ' ')
    {
-
-
-
       i++;
    }
 
-   
-   return 1;
+   return i;
 }
 
+int main()
+{
+   scanf("%s", input);
 
+   long i = 0;
+   long ci = 0;
+
+   while (i < strlen(input))
+   {
+
+      if (input[i] == ' ')
+      {
+         i = jumpToNextWord(i);
+      }
+
+      int opCodeIndex = isOpCode(i);
+      if (opCodeIndex != -1)
+      {
+         code[ci] = opCodeIndex;
+      }
+      else
+      {
+         if (isRegister(i))
+         {
+         }else{
+
+         }
+      }
+
+      ci++;
+   }
+
+   return 1;
+}
