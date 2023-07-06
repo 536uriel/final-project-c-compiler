@@ -126,7 +126,7 @@ int main()
          {
             if (isSymbol(i))
             {
-               
+
                int cnt = 0;
                while (input[i] != ' ')
                {
@@ -134,13 +134,12 @@ int main()
                }
                char word[cnt];
                int j;
-               for(j = 0;j < cnt;j++)
+               for (j = 0; j < cnt; j++)
                {
                   word[j] = input[i + j];
                }
 
                /*insert here symbol*/
-               
             }
             else
             {
