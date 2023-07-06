@@ -9,6 +9,8 @@ long code[1024];
 char opcode[16][4] = {
     "mov", "cmp", "add", "sub", "not", "clr", "lea", "inc", "dec", "jmp", "bne", "red", "prn", "jsr", "rts", "stop"};
 
+char symbols[1024][1024];
+
 int isWordMatch(int i, char word[])
 {
    int index;
@@ -47,7 +49,10 @@ int isRegister(int i)
    int x;
    for (x = 1; x <= 8; x++)
    {
-      if (isWordMatch(i, ("@r" + x)) == 1)
+      char buff[4];
+      /*connect int x to string buff*/
+      snprintf("@r%d", 4, x);
+      if (isWordMatch(i, buff) == 1)
       {
          return TRUE;
       }
@@ -56,9 +61,35 @@ int isRegister(int i)
    return FALSE;
 }
 
+int isSymbol(i)
+{
+   while (input[i] != ' ')
+   {
+      i++;
+   }
+   if (input[i - 1] == ':')
+   {
+      return TRUE;
+   }
+   else
+   {
+      return FALSE;
+   }
+}
+
 int jumpToNextWord(int i)
 {
    while (input[i] == ' ')
+   {
+      i++;
+   }
+
+   return i;
+}
+
+int jumpToEndOfWord(int i)
+{
+   while (input[i] != ' ')
    {
       i++;
    }
@@ -90,10 +121,35 @@ int main()
       {
          if (isRegister(i))
          {
-         }else{
+         }
+         else
+         {
+            if (isSymbol(i))
+            {
+               
+               int cnt = 0;
+               while (input[i] != ' ')
+               {
+                  cnt++;
+               }
+               char word[cnt];
+               int j;
+               for(j = 0;j < cnt;j++)
+               {
+                  word[j] = input[i + j];
+               }
 
+               /*insert here symbol*/
+               
+            }
+            else
+            {
+            }
          }
       }
+
+      i = jumpToEndOfWord(i);
+      i++;
 
       ci++;
    }
