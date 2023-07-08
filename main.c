@@ -1,13 +1,17 @@
 #include <stdio.h>
 #include <string.h>
+#include "to-binary.c"
 
 #define FALSE 0;
 #define TRUE 1;
 
+char opcode[16][4] = {
+    "mov", "cmp", "add", "sub",
+    "not", "clr", "lea", "inc", "dec",
+    "jmp", "bne", "red", "prn", "jsr", "rts", "stop"};
+
 char input[2000];
 long code[1024];
-char opcode[16][4] = {
-    "mov", "cmp", "add", "sub", "not", "clr", "lea", "inc", "dec", "jmp", "bne", "red", "prn", "jsr", "rts", "stop"};
 
 char symbols[1024][1024];
 
