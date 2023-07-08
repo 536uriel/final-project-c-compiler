@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include "to-binary.c"
 
@@ -13,7 +14,15 @@ char opcode[16][4] = {
 char input[2000];
 long code[1024];
 
-char symbols[1024][1024];
+struct Symbol
+{
+   int address;
+   char name[];
+};
+
+struct Symbol symbols[100];
+int indexSymbols = 0;
+
 
 int isWordMatch(int i, char word[])
 {
@@ -136,14 +145,17 @@ int main()
                {
                   cnt++;
                }
-               char word[cnt];
+               
                int j;
                for (j = 0; j < cnt; j++)
                {
-                  word[j] = input[i + j];
+                  symbols[indexSymbols].name[j] = input[i + j];
                }
 
-               /*insert here symbol*/
+               symbols[indexSymbols].address = ci;
+               indexSymbols++;
+
+            
             }
             else
             {
