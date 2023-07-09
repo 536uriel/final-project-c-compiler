@@ -12,16 +12,7 @@ char opcode[16][4] = {
     "jmp", "bne", "red", "prn", "jsr", "rts", "stop"};
 
 char input[2000];
-struct Memory
-{
-   int opcode;
-   int reg;
-   int label;
-   int num;
-   char c;
-};
-struct Memory memory[1024];
-long mi = 0;
+
 
 struct Symbol
 {
@@ -31,7 +22,6 @@ struct Symbol
 
 struct Symbol symbols[100];
 int indexSymbols = 0;
-
 
 int isWordMatch(int i, char word[])
 {
@@ -123,7 +113,11 @@ int main()
 {
    scanf("%s", input);
 
+   /*input index*/
    long i = 0;
+   /*memory index*/
+   long mi = 0;
+
 
    while (i < strlen(input))
    {
@@ -133,44 +127,23 @@ int main()
          i = jumpToNextWord(i);
       }
 
-      int opCodeIndex = isOpCode(i);
-      if (opCodeIndex != -1)
+      if (isSymbol(i))
       {
-         memory[mi].opcode = opCodeIndex;
-      }
-      else
-      {
-         int regNum = isRegister(i);
-         if (regNum != -1)
+
+         int cnt = 0;
+         while (input[i] != ' ')
          {
-            memory[mi].reg = regNum;
+            cnt++;
          }
-         else
+
+         int j;
+         for (j = 0; j < cnt; j++)
          {
-            if (isSymbol(i))
-            {
-
-               int cnt = 0;
-               while (input[i] != ' ')
-               {
-                  cnt++;
-               }
-               
-               int j;
-               for (j = 0; j < cnt; j++)
-               {
-                  symbols[indexSymbols].name[j] = input[i + j];
-               }
-
-               symbols[indexSymbols].address = mi;
-               indexSymbols++;
-
-            
-            }
-            else
-            {
-            }
+            symbols[indexSymbols].name[j] = input[i + j];
          }
+
+         symbols[indexSymbols].address = mi;
+         indexSymbols++;
       }
 
       i = jumpToEndOfWord(i);
@@ -178,6 +151,9 @@ int main()
 
       mi++;
    }
+
+   i = 0;
+   mi = 0;
 
    return 1;
 }
