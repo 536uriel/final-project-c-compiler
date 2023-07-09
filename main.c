@@ -89,7 +89,7 @@ int isSymbol(i)
    }
 }
 
-int jumpToNextWord(int i)
+int skipBlank(int i)
 {
    while (input[i] == ' ')
    {
@@ -124,7 +124,12 @@ int main()
 
       if (input[i] == ' ')
       {
-         i = jumpToNextWord(i);
+         i = skipBlank(i);
+      }
+
+      if (input[i] == ',')
+      {
+         i++;
       }
 
       if (isSymbol(i))
@@ -154,6 +159,10 @@ int main()
 
    i = 0;
    mi = 0;
+
+   /* until here its first level of the compliler */
+
+
 
    return 1;
 }
