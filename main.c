@@ -112,6 +112,7 @@ int isSymbol(i)
 
 struct Mcro
 {
+   char name[30];
    char str[500];
 };
 struct Mcro mcros[100];
@@ -147,6 +148,20 @@ struct Mcro createMcro(int i)
    int mindex = 0;
    while (!isWordMatch(i, "endmcro"))
    {
+      /*add mcro name*/
+      i = jumpToEndOfWord(i);
+      i++;
+      i = skipBlank(i);
+      int iname = 0;
+      while (input[i] != ' ')
+      {
+         m.name[iname] = input[i];
+         iname++;
+         i++;
+      }
+
+      i++;
+   
       m.str[mindex] = input[i];
       i++;
       mindex++;
@@ -236,6 +251,37 @@ int main()
             i++;
          }
          /*jump aftre endmcro*/
+         i += 8;
+      }
+   }
+
+   /*add the code inside the mcros any time the instance shown 
+   and delete mcro defention from input*/
+   while (i < strlen(input))
+   {
+      if (input[i] == ' ')
+      {
+         i = skipBlank(i);
+      }
+
+      if (input[i] == ',')
+      {
+         i++;
+      }
+
+      if (isMcro(i))
+      {
+         /*jump after word mcro*/
+         i = jumpToEndOfWord(i);
+         i++;
+
+         mcros[mcroIndex] = createMcro(i);
+         mcroIndex++;
+         while (!isWordMatch(i, "endmcro"))
+         {
+            i++;
+         }
+         /*jump after endmcro*/
          i += 8;
       }
    }
