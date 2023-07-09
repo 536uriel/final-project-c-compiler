@@ -13,15 +13,34 @@ char opcode[16][4] = {
 
 char input[2000];
 
-
 struct Symbol
 {
    int address;
-   char name[];
+   char name[20];
 };
 
 struct Symbol symbols[100];
 int indexSymbols = 0;
+
+int skipBlank(int i)
+{
+   while (input[i] == ' ')
+   {
+      i++;
+   }
+
+   return i;
+}
+
+int jumpToEndOfWord(int i)
+{
+   while (input[i] != ' ')
+   {
+      i++;
+   }
+
+   return i;
+}
 
 int isWordMatch(int i, char word[])
 {
@@ -89,25 +108,30 @@ int isSymbol(i)
    }
 }
 
-int skipBlank(int i)
-{
-   while (input[i] == ' ')
-   {
-      i++;
-   }
+/*new code here**************************** */
 
-   return i;
+struct Mcro
+{
+   char str[500];
+};
+
+int isData()
+{
 }
 
-int jumpToEndOfWord(int i)
+int isStringOperand()
 {
-   while (input[i] != ' ')
-   {
-      i++;
-   }
-
-   return i;
 }
+
+int isExtern()
+{
+}
+
+struct Mcro isMcro(int i)
+{
+}
+
+/*end new code here**************************** */
 
 int main()
 {
@@ -117,7 +141,6 @@ int main()
    long i = 0;
    /*memory index*/
    long mi = 0;
-
 
    while (i < strlen(input))
    {
@@ -159,10 +182,9 @@ int main()
 
    i = 0;
    mi = 0;
+   indexSymbols = 0;
 
    /* until here its first level of the compliler */
-
-
 
    return 1;
 }
