@@ -114,6 +114,8 @@ struct Mcro
 {
    char str[500];
 };
+struct Mcro mcros[100];
+int mcroIndex = 0;
 
 int isData()
 {
@@ -127,8 +129,30 @@ int isExtern()
 {
 }
 
-struct Mcro isMcro(int i)
+int isMcro(int i)
 {
+   if (isWordMatch(i, "mcro"))
+   {
+      return TRUE;
+   }
+   else
+   {
+      return FALSE;
+   }
+}
+
+struct Mcro createMcro(int i)
+{
+   static struct Mcro m;
+   int mindex = 0;
+   while (!isWordMatch(i, "endmcro"))
+   {
+      m.str[mindex] = input[i];
+      i++;
+      mindex++;
+   }
+
+   return m;
 }
 
 /*end new code here**************************** */
@@ -185,6 +209,36 @@ int main()
    indexSymbols = 0;
 
    /* until here its first level of the compliler */
+
+   /*create macros*/
+   while (i < strlen(input))
+   {
+      if (input[i] == ' ')
+      {
+         i = skipBlank(i);
+      }
+
+      if (input[i] == ',')
+      {
+         i++;
+      }
+
+      if (isMcro(i))
+      {
+         /*jump after word mcro*/
+         i = jumpToEndOfWord(i);
+         i++;
+
+         mcros[mcroIndex] = createMcro(i);
+         mcroIndex++;
+         while (!isWordMatch(i, "endmcro"))
+         {
+            i++;
+         }
+         /*jump aftre endmcro*/
+         i += 8;
+      }
+   }
 
    return 1;
 }
