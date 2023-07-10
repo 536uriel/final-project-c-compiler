@@ -281,6 +281,9 @@ int main()
       i2++;
    }
 
+   i = 0;
+   i2 = 0;
+
    /*insert insider mcro code into mcro instances*/
    while (i2 < strlen(newInput))
    {
@@ -294,10 +297,15 @@ int main()
             i2++;
             itmp++;
          }
+
+         mcroIndex++;
       }
 
       i2++;
    }
+
+   i2 = 0;
+   mcroIndex = 0;
 
    /*until here summery:
    we created array of symbol with there names and addresses
