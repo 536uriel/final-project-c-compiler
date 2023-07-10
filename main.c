@@ -156,7 +156,6 @@ struct Mcro createMcro(int i, char input[])
    return m;
 }
 
-
 int isData(int i, char input[])
 {
    if (isWordMatch(i, ".data", input))
@@ -207,8 +206,21 @@ int isExtern(int i, char input[])
 
 /*new code here**************************** */
 
+/*to do:*/
+int *opcode_case_to_binary(int iopcode, int i, char input[])
+{
+   static int binary[3];
 
+   i = jumpToEndOfWord(i, input);
+   i = skipBlank(i, input);
+   i++;
 
+   if (isRegister(i, input))
+   {
+   }
+
+   return binary;
+}
 
 /*end new code here**************************** */
 
