@@ -108,8 +108,6 @@ int isSymbol(i)
    }
 }
 
-/*new code here**************************** */
-
 struct Mcro
 {
    char name[30];
@@ -117,18 +115,6 @@ struct Mcro
 };
 struct Mcro mcros[100];
 int mcroIndex = 0;
-
-int isData()
-{
-}
-
-int isStringOperand()
-{
-}
-
-int isExtern()
-{
-}
 
 int isMcro(int i)
 {
@@ -161,13 +147,27 @@ struct Mcro createMcro(int i)
       }
 
       i++;
-   
+
       m.str[mindex] = input[i];
       i++;
       mindex++;
    }
 
    return m;
+}
+
+/*new code here**************************** */
+
+int isData()
+{
+}
+
+int isStringOperand()
+{
+}
+
+int isExtern()
+{
 }
 
 /*end new code here**************************** */
@@ -250,41 +250,59 @@ int main()
          {
             i++;
          }
-         /*jump aftre endmcro*/
-         i += 8;
-      }
-   }
-
-   /*add the code inside the mcros any time the instance shown 
-   and delete mcro defention from input*/
-   while (i < strlen(input))
-   {
-      if (input[i] == ' ')
-      {
-         i = skipBlank(i);
-      }
-
-      if (input[i] == ',')
-      {
-         i++;
-      }
-
-      if (isMcro(i))
-      {
-         /*jump after word mcro*/
-         i = jumpToEndOfWord(i);
-         i++;
-
-         mcros[mcroIndex] = createMcro(i);
-         mcroIndex++;
-         while (!isWordMatch(i, "endmcro"))
-         {
-            i++;
-         }
          /*jump after endmcro*/
          i += 8;
       }
    }
+
+   i = 0;
+   mcroIndex = 0;
+
+   char newInput[2000];
+   int i2 = 0;
+
+   /*skip mcro code in new input text*/
+   while (i < strlen(input))
+   {
+      newInput[i2] = input[i];
+
+      if (isMcro(i))
+      {
+         /*skip mcro defenition code*/
+         while (!isWordMatch(i, "endmcro"))
+         {
+            i++;
+         }
+
+         i = jumpToEndOfWord(i);
+      }
+
+      i++;
+      i2++;
+   }
+
+   /*insert insider mcro code into mcro instances*/
+   while (i2 < strlen(newInput))
+   {
+      if (isWordMatch(i2, mcros[mcroIndex].name))
+      {
+         int lentmp = strlen(mcros[mcroIndex].str);
+         int itmp = 0;
+         while (itmp < lentmp)
+         {
+            newInput[i2] = mcros[mcroIndex].str[itmp];
+            i2++;
+            itmp++;
+         }
+      }
+
+      i2++;
+   }
+
+   /*until here summery:
+   we created array of symbol with there names and addresses
+   and we created macros  instances and replaced the instance
+   with the insider code*/
 
    return 1;
 }
