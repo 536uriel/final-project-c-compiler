@@ -157,7 +157,7 @@ struct Mcro createMcro(int i, char input[])
 }
 
 
-int isData(int i, char input)
+int isData(int i, char input[])
 {
    if (isWordMatch(i, ".data", input))
    {
@@ -169,7 +169,7 @@ int isData(int i, char input)
    }
 }
 
-int isStringOperand(int i, char input)
+int isStringOperand(int i, char input[])
 {
    if (isWordMatch(i, ".string", input))
    {
@@ -181,7 +181,7 @@ int isStringOperand(int i, char input)
    }
 }
 
-int isEntry(int i, char input)
+int isEntry(int i, char input[])
 {
    if (isWordMatch(i, ".entry", input))
    {
@@ -193,7 +193,7 @@ int isEntry(int i, char input)
    }
 }
 
-int isExtern(int i, char input)
+int isExtern(int i, char input[])
 {
    if (isWordMatch(i, ".extern", input))
    {
