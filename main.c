@@ -11,7 +11,7 @@ char opcode[16][4] = {
     "not", "clr", "lea", "inc", "dec",
     "jmp", "bne", "red", "prn", "jsr", "rts", "stop"};
 
-char input[2000];
+char inputText[2000];
 
 struct Symbol
 {
@@ -22,7 +22,7 @@ struct Symbol
 struct Symbol symbols[100];
 int indexSymbols = 0;
 
-int skipBlank(int i)
+int skipBlank(int i, char input[])
 {
    while (input[i] == ' ')
    {
@@ -32,7 +32,7 @@ int skipBlank(int i)
    return i;
 }
 
-int jumpToEndOfWord(int i)
+int jumpToEndOfWord(int i, char input[])
 {
    while (input[i] != ' ')
    {
@@ -42,7 +42,7 @@ int jumpToEndOfWord(int i)
    return i;
 }
 
-int isWordMatch(int i, char word[])
+int isWordMatch(int i, char word[], char input[])
 {
    int index;
    for (index = 0; index < strlen(word); index++)
@@ -61,12 +61,12 @@ int isWordMatch(int i, char word[])
    }
 }
 
-int isOpCode(int i)
+int isOpCode(int i, char input[])
 {
    int x;
    for (x = 0; x < sizeof(opcode); x++)
    {
-      if (isWordMatch(i, opcode[x]) == 1)
+      if (isWordMatch(i, opcode[x], input) == 1)
       {
          return x;
       }
@@ -75,7 +75,7 @@ int isOpCode(int i)
    return -1;
 }
 
-int isRegister(int i)
+int isRegister(int i, char input[])
 {
    int x;
    for (x = 1; x <= 8; x++)
@@ -83,7 +83,7 @@ int isRegister(int i)
       char buff[4];
       /*connect int x to string buff*/
       snprintf("@r%d", 4, x);
-      if (isWordMatch(i, buff) == 1)
+      if (isWordMatch(i, buff, input) == 1)
       {
          return x;
       }
@@ -92,7 +92,7 @@ int isRegister(int i)
    return -1;
 }
 
-int isSymbol(i)
+int isSymbol(int i, char input[])
 {
    while (input[i] != ' ')
    {
@@ -116,9 +116,9 @@ struct Mcro
 struct Mcro mcros[100];
 int mcroIndex = 0;
 
-int isMcro(int i)
+int isMcro(int i, char input[])
 {
-   if (isWordMatch(i, "mcro"))
+   if (isWordMatch(i, "mcro", input))
    {
       return TRUE;
    }
@@ -128,16 +128,16 @@ int isMcro(int i)
    }
 }
 
-struct Mcro createMcro(int i)
+struct Mcro createMcro(int i, char input[])
 {
    static struct Mcro m;
    int mindex = 0;
-   while (!isWordMatch(i, "endmcro"))
+   while (!isWordMatch(i, "endmcro", input))
    {
       /*add mcro name*/
-      i = jumpToEndOfWord(i);
+      i = jumpToEndOfWord(i, input);
       i++;
-      i = skipBlank(i);
+      i = skipBlank(i, input);
       int iname = 0;
       while (input[i] != ' ')
       {
@@ -156,49 +156,89 @@ struct Mcro createMcro(int i)
    return m;
 }
 
+
+int isData(int i, char input)
+{
+   if (isWordMatch(i, ".data", input))
+   {
+      return TRUE;
+   }
+   else
+   {
+      return FALSE;
+   }
+}
+
+int isStringOperand(int i, char input)
+{
+   if (isWordMatch(i, ".string", input))
+   {
+      return TRUE;
+   }
+   else
+   {
+      return FALSE;
+   }
+}
+
+int isEntry(int i, char input)
+{
+   if (isWordMatch(i, ".entry", input))
+   {
+      return TRUE;
+   }
+   else
+   {
+      return FALSE;
+   }
+}
+
+int isExtern(int i, char input)
+{
+   if (isWordMatch(i, ".extern", input))
+   {
+      return TRUE;
+   }
+   else
+   {
+      return FALSE;
+   }
+}
+
 /*new code here**************************** */
 
-int isData()
-{
-}
 
-int isStringOperand()
-{
-}
 
-int isExtern()
-{
-}
 
 /*end new code here**************************** */
 
 int main()
 {
-   scanf("%s", input);
+   scanf("%s", inputText);
 
    /*input index*/
    long i = 0;
    /*memory index*/
    long mi = 0;
 
-   while (i < strlen(input))
+   while (i < strlen(inputText))
    {
 
-      if (input[i] == ' ')
+      if (inputText[i] == ' ')
       {
-         i = skipBlank(i);
+         i = skipBlank(i, inputText);
       }
 
-      if (input[i] == ',')
+      if (inputText[i] == ',')
       {
          i++;
       }
 
-      if (isSymbol(i))
+      if (isSymbol(i, inputText))
       {
 
          int cnt = 0;
-         while (input[i] != ' ')
+         while (inputText[i] != ' ')
          {
             cnt++;
          }
@@ -206,14 +246,14 @@ int main()
          int j;
          for (j = 0; j < cnt; j++)
          {
-            symbols[indexSymbols].name[j] = input[i + j];
+            symbols[indexSymbols].name[j] = inputText[i + j];
          }
 
          symbols[indexSymbols].address = mi;
          indexSymbols++;
       }
 
-      i = jumpToEndOfWord(i);
+      i = jumpToEndOfWord(i, inputText);
       i++;
 
       mi++;
@@ -226,27 +266,27 @@ int main()
    /* until here its first level of the compliler */
 
    /*create macros*/
-   while (i < strlen(input))
+   while (i < strlen(inputText))
    {
-      if (input[i] == ' ')
+      if (inputText[i] == ' ')
       {
-         i = skipBlank(i);
+         i = skipBlank(i, inputText);
       }
 
-      if (input[i] == ',')
+      if (inputText[i] == ',')
       {
          i++;
       }
 
-      if (isMcro(i))
+      if (isMcro(i, inputText))
       {
          /*jump after word mcro*/
-         i = jumpToEndOfWord(i);
+         i = jumpToEndOfWord(i, inputText);
          i++;
 
-         mcros[mcroIndex] = createMcro(i);
+         mcros[mcroIndex] = createMcro(i, inputText);
          mcroIndex++;
-         while (!isWordMatch(i, "endmcro"))
+         while (!isWordMatch(i, "endmcro", inputText))
          {
             i++;
          }
@@ -262,19 +302,19 @@ int main()
    int i2 = 0;
 
    /*skip mcro code in new input text*/
-   while (i < strlen(input))
+   while (i < strlen(inputText))
    {
-      newInput[i2] = input[i];
+      newInput[i2] = inputText[i];
 
-      if (isMcro(i))
+      if (isMcro(i, inputText))
       {
          /*skip mcro defenition code*/
-         while (!isWordMatch(i, "endmcro"))
+         while (!isWordMatch(i, "endmcro", inputText))
          {
             i++;
          }
 
-         i = jumpToEndOfWord(i);
+         i = jumpToEndOfWord(i, inputText);
       }
 
       i++;
@@ -287,7 +327,7 @@ int main()
    /*insert insider mcro code into mcro instances*/
    while (i2 < strlen(newInput))
    {
-      if (isWordMatch(i2, mcros[mcroIndex].name))
+      if (isWordMatch(i2, mcros[mcroIndex].name, newInput))
       {
          int lentmp = strlen(mcros[mcroIndex].str);
          int itmp = 0;
@@ -311,10 +351,6 @@ int main()
    we created array of symbol with there names and addresses
    and we created macros  instances and replaced the instance
    with the insider code*/
-
-
-   /*important!!!!!!!!!!*/
-   /*to do - refactor helper functions with adding input param*/
 
    return 1;
 }
