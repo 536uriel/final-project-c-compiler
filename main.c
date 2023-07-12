@@ -206,20 +206,73 @@ int isExtern(int i, char input[])
 
 /*new code here**************************** */
 
-/*to do:*/
+/*to do: translate to binary code*/
+
+int is_immidiate(int i, char input[])
+{
+   /*to do: check if number or letter*/
+}
+
+int is_r_to_r_case(int i, char input[])
+{
+   if (input[i] == '@')
+   {
+      i += 3;
+      i = skipBlank(i, input);
+      i++;
+      i = skipBlank(i, input);
+      if (input[i] == '@')
+      {
+         return TRUE;
+      }
+      else
+      {
+         return FALSE;
+      }
+   }
+   else
+   {
+      return FALSE;
+   }
+}
+
 int *opcode_case_to_binary(int iopcode, int i, char input[])
 {
-   static int binary[3];
+   /*decode array in decimal*/
+   static int d_code[3][4];
 
    i = jumpToEndOfWord(i, input);
    i = skipBlank(i, input);
    i++;
 
-   if (isRegister(i, input))
+   if (is_r_to_r_case(i, input))
    {
+      d_code[0][0] = 0;
+      d_code[0][1] = 5;
+      d_code[0][2] = iopcode;
+      d_code[0][3] = 5;
+
+      d_code[1][0] = 0;
+      d_code[1][1] = 5;
+      d_code[1][2] = 5;
+      /*case -1 means ignore the last decoding*/
+      d_code[1][3] = -1;
+
+      int i2;
+      int j;
+      for (i2 = 2; i2 < 4; i2++)
+      {
+         for (j = 0; j < 4; j++)
+         {
+            d_code[i2][j] = -1;
+         }
+      }
+
+      i2 = 0;
+      j = 0;
    }
 
-   return binary;
+   return d_code;
 }
 
 /*end new code here**************************** */
