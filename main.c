@@ -208,9 +208,44 @@ int isExtern(int i, char input[])
 
 /*to do: translate to binary code*/
 
+int isDigit(char c)
+{
+   if (c > '0' && c < '9')
+   {
+      return TRUE;
+   }
+   else
+   {
+      return FALSE;
+   }
+}
+
+int toInt(char digits[])
+{
+   /*to do:*/
+   int num;
+   int index;
+   for (index = 0; index < sizeof(digits); index++)
+   {
+      int tmp = digits[index] - '0';
+   }
+}
+
+int isLetter(char c)
+{
+   if (c > 'a' && c < 'z')
+   {
+      return TRUE;
+   }
+   else
+   {
+      return FALSE;
+   }
+}
+
 int is_immidiate(int i, char input[])
 {
-   /*to do: check if number or letter*/
+   /*to do:*/
 }
 
 int is_r_to_r_case(int i, char input[])
@@ -279,7 +314,7 @@ int *opcode_case_to_binary(int iopcode, int i, char input[])
 
 int main()
 {
-   scanf("%s", inputText);
+   /*to fix: scanf("%s", inputText);*/
 
    /*input index*/
    long i = 0;
