@@ -7,9 +7,9 @@
 #define TRUE 1;
 
 char opcode[16][4] = {
-    "mov", "cmp", "add", "sub",
-    "not", "clr", "lea", "inc", "dec",
-    "jmp", "bne", "red", "prn", "jsr", "rts", "stop"};
+   "mov", "cmp", "add", "sub", "lea",
+   "not", "clr", "inc", "dec", "jmp", "bne", "red", "prn", "jsr",
+   "rts", "stop"};
 
 char inputText[2000];
 
@@ -324,8 +324,6 @@ int *opcode_case_to_binary(int iopcode, int i, char input[])
          d_code[2][1] = -1;
          d_code[2][2] = -1;
          d_code[2][3] = -1;
-
-
       }
    }
 
@@ -355,7 +353,6 @@ int *opcode_case_to_binary(int iopcode, int i, char input[])
       i2 = 0;
       j = 0;
    }
-
 
    /* to do: make 2 operands case! */
 
