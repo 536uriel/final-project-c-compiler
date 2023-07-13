@@ -222,13 +222,24 @@ int isDigit(char c)
 
 int toInt(char digits[])
 {
-   /*to do:*/
-   int num;
+
+   int num = 0;
    int index;
    for (index = 0; index < sizeof(digits); index++)
    {
-      int tmp = digits[index] - '0';
+      int digit = digits[index] - '0';
+      if (num == 0)
+      {
+         num = digit;
+      }
+      else
+      {
+         num *= 10;
+         num += digit;
+      }
    }
+
+   return num;
 }
 
 int isLetter(char c)
@@ -241,11 +252,6 @@ int isLetter(char c)
    {
       return FALSE;
    }
-}
-
-int is_immidiate(int i, char input[])
-{
-   /*to do:*/
 }
 
 int is_r_to_r_case(int i, char input[])
@@ -275,14 +281,57 @@ int *opcode_case_to_binary(int iopcode, int i, char input[])
 {
    /*decode array in decimal*/
    static int d_code[3][4];
+   d_code[0][0] = 0;
 
    i = jumpToEndOfWord(i, input);
    i = skipBlank(i, input);
    i++;
 
+   /*immidiate case*/
+   if (isDigit(input[i]))
+   {
+      int itmp = jumpToEndOfWord(i, input);
+      itmp = skipBlank(itmp, input);
+      /*skip ',' */
+      itmp++;
+      itmp = skipBlank(itmp, input);
+      /*check if number to register immidiate case*/
+      if (input[itmp] == '@')
+      {
+
+         int numberlen = jumpToEndOfWord(i, input) - i;
+         char num[numberlen];
+         int index;
+         for (index = 0; index < numberlen; index++)
+         {
+            num[index] = input[index];
+         }
+
+         int n_operand = toInt(num);
+         int register_num = input[itmp + 2];
+
+         /*to do: check if the decoding here is correct*/
+         d_code[0][1] = 1;
+         d_code[0][2] = iopcode;
+         d_code[0][3] = 1;
+
+         d_code[1][0] = n_operand;
+         d_code[1][1] = -1;
+         d_code[1][2] = -1;
+         d_code[1][3] = -1;
+
+         d_code[2][0] = register_num;
+         d_code[2][1] = -1;
+         d_code[2][2] = -1;
+         d_code[2][3] = -1;
+
+
+      }
+   }
+
    if (is_r_to_r_case(i, input))
    {
-      d_code[0][0] = 0;
+
       d_code[0][1] = 5;
       d_code[0][2] = iopcode;
       d_code[0][3] = 5;
@@ -306,6 +355,9 @@ int *opcode_case_to_binary(int iopcode, int i, char input[])
       i2 = 0;
       j = 0;
    }
+
+
+   /* to do: make 2 operands case! */
 
    return d_code;
 }
