@@ -204,8 +204,6 @@ int isExtern(int i, char input[])
    }
 }
 
-/*new code here**************************** */
-
 /*to do: translate to binary code*/
 
 int isDigit(char c)
@@ -296,6 +294,8 @@ int get_opcode_group(int iopcode)
       return 3;
    }
 }
+
+/*new code here****************************************** */
 
 int *opcode_case_to_binary(int iopcode, int i, char input[])
 {
@@ -390,7 +390,6 @@ int *opcode_case_to_binary(int iopcode, int i, char input[])
       d_code[0][2] = iopcode;
       d_code[0][3] = 0;
 
-
       int i2;
       int j;
       for (i2 = 2; i2 < 4; i2++)
@@ -408,7 +407,13 @@ int *opcode_case_to_binary(int iopcode, int i, char input[])
    return d_code;
 }
 
-/*end new code here**************************** */
+/*to do: */
+
+int *directive_cases_to_binary(int i, char input[])
+{
+}
+
+/*end new code here*************************************** */
 
 int main()
 {
