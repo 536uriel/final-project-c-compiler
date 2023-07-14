@@ -309,74 +309,57 @@ int *opcode_case_to_binary(int iopcode, int i, char input[])
 
    int opcode_group = get_opcode_group(iopcode);
 
+   /*statrt index input from sccond operand*/
+
    if (opcode_group == 1)
    {
 
-      /*immidiate case*/
+      /*to do: check sccond operand  & third operand if
+       label case or register case or number case!!!!!!!!!!!!!!!!!!!!!!!!*/
+
       if (isDigit(input[i]))
       {
-         int itmp = jumpToEndOfWord(i, input);
-         itmp = skipBlank(itmp, input);
-         /*skip ',' */
-         itmp++;
-         itmp = skipBlank(itmp, input);
-         /*check if number to register immidiate case*/
-         if (input[itmp] == '@')
+         int numlen = jumpToEndOfWord(i, input) - i;
+         int i2;
+         char cdigits[numlen];
+         for (i2 = 0; i2 < numlen; i2++)
+         {
+            cdigits[i2] = input[i];
+            i++;
+         }
+
+         int numoperand = toInt(cdigits);
+
+         /*to compleate.......*/
+      }
+      else
+      {
+         if (is_r_to_r_case(i, input))
          {
 
-            int numberlen = jumpToEndOfWord(i, input) - i;
-            char num[numberlen];
-            int index;
-            for (index = 0; index < numberlen; index++)
-            {
-               num[index] = input[index];
-            }
-
-            int n_operand = toInt(num);
-            int register_num = input[itmp + 2];
-
-            /*to do: check if the decoding here is correct*/
-            d_code[0][1] = 1;
+            d_code[0][1] = 5;
             d_code[0][2] = iopcode;
-            d_code[0][3] = 1;
+            d_code[0][3] = 5;
 
-            d_code[1][0] = n_operand;
-            d_code[1][1] = -1;
-            d_code[1][2] = -1;
+            d_code[1][0] = 0;
+            d_code[1][1] = 5;
+            d_code[1][2] = 5;
+            /*case -1 means ignore the last decoding*/
             d_code[1][3] = -1;
 
-            d_code[2][0] = register_num;
-            d_code[2][1] = -1;
-            d_code[2][2] = -1;
-            d_code[2][3] = -1;
-         }
-      }
-
-      if (is_r_to_r_case(i, input))
-      {
-
-         d_code[0][1] = 5;
-         d_code[0][2] = iopcode;
-         d_code[0][3] = 5;
-
-         d_code[1][0] = 0;
-         d_code[1][1] = 5;
-         d_code[1][2] = 5;
-         /*case -1 means ignore the last decoding*/
-         d_code[1][3] = -1;
-
-         int i2;
-         int j;
-         for (i2 = 2; i2 < 4; i2++)
-         {
-            for (j = 0; j < 4; j++)
+            int i2;
+            int j;
+            for (i2 = 2; i2 < 4; i2++)
             {
-               d_code[i2][j] = -1;
+               for (j = 0; j < 4; j++)
+               {
+                  d_code[i2][j] = -1;
+               }
             }
-         }
 
-         i2 = 0;
-         j = 0;
+            i2 = 0;
+            j = 0;
+         }
       }
    }
 
@@ -384,7 +367,6 @@ int *opcode_case_to_binary(int iopcode, int i, char input[])
 
    if (opcode_group == 2)
    {
-      /*to do - check cases */
 
       /* to do - d_code[0][1] = ?;*/
       d_code[0][2] = iopcode;
