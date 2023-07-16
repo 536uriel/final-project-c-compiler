@@ -339,6 +339,21 @@ int *opcode_case_to_binary(int iopcode, int i, char input[])
 
          if (input[itmp] == '@')
          {
+            int registernum = input[itmp + 2] - '0';
+
+            /*case of opcode number,register*/
+
+            d_code[0][1] = 1;
+            d_code[0][2] = iopcode;
+            d_code[0][3] = 5;
+
+            d_code[1][0] = numoperand;
+            d_code[1][1] = 0;
+            d_code[1][2] = 0;
+
+            d_code[2][0] = registernum;
+            d_code[2][1] = 0;
+            d_code[2][2] = 0;
          }
          else
          {
@@ -356,12 +371,13 @@ int *opcode_case_to_binary(int iopcode, int i, char input[])
             int tmpindex;
             for (i2 = 0; i2 < sizeof(symbols); i2++)
             {
-               for (j = 0;j < sizeof(symbols[i2].name);j++)
+               for (j = 0; j < sizeof(symbols[i2].name); j++)
                {
-                  if(symbols[i2].name[j] == symbole_name[j])
+                  if (symbols[i2].name[j] == symbole_name[j])
                   {
                      bool = TRUE;
-                  }else
+                  }
+                  else
                   {
                      bool = FALSE;
                      break;
@@ -375,6 +391,20 @@ int *opcode_case_to_binary(int iopcode, int i, char input[])
             }
 
             int sybol_address = symbols[tmpindex].address;
+
+            /*case of opcode number,label*/
+
+            d_code[0][1] = 1;
+            d_code[0][2] = iopcode;
+            d_code[0][3] = 3;
+
+            d_code[1][0] = numoperand;
+            d_code[1][1] = 0;
+            d_code[1][2] = 0;
+
+            d_code[2][0] = sybol_address;
+            d_code[2][1] = 0;
+            d_code[2][2] = 0;
          }
       }
       else
