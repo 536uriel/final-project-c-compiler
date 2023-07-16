@@ -252,6 +252,8 @@ int isLetter(char c)
    }
 }
 
+/*new code here****************************************** */
+
 int is_r_to_r_case(int i, char input[])
 {
    if (input[i] == '@')
@@ -295,21 +297,19 @@ int get_opcode_group(int iopcode)
    }
 }
 
-/*new code here****************************************** */
-
 int *opcode_case_to_binary(int iopcode, int i, char input[])
 {
    /*decode array in decimal*/
    static int d_code[3][4];
    d_code[0][0] = 0;
+   int itmp = i;
 
-   i = jumpToEndOfWord(i, input);
-   i = skipBlank(i, input);
-   i++;
+   itmp = jumpToEndOfWord(itmp, input);
+   itmp = skipBlank(itmp, input);
 
    int opcode_group = get_opcode_group(iopcode);
 
-   /*statrt index input from sccond operand*/
+   /*start index input from sccond operand*/
 
    if (opcode_group == 1)
    {
@@ -317,24 +317,69 @@ int *opcode_case_to_binary(int iopcode, int i, char input[])
       /*to do: check sccond operand  & third operand if
        label case or register case or number case!!!!!!!!!!!!!!!!!!!!!!!!*/
 
-      if (isDigit(input[i]))
+      if (isDigit(input[itmp]))
       {
          int numlen = jumpToEndOfWord(i, input) - i;
          int i2;
          char cdigits[numlen];
          for (i2 = 0; i2 < numlen; i2++)
          {
-            cdigits[i2] = input[i];
-            i++;
+            cdigits[i2] = input[itmp];
+            itmp++;
          }
+
+         itmp++;
 
          int numoperand = toInt(cdigits);
 
          /*to compleate.......*/
+         itmp = skipBlank(itmp, input);
+         itmp++;
+         itmp = skipBlank(itmp, input);
+
+         if (input[itmp] == '@')
+         {
+         }
+         else
+         {
+            /*find the symbol address*/
+            char symbole_name[20];
+            int symbolen = jumpToEndOfWord(itmp, input) - itmp;
+            for (i2 = 0; i2 < symbolen; i2++)
+            {
+               symbole_name[i2] = input[itmp];
+               itmp++;
+            }
+
+            int j;
+            int bool = FALSE;
+            int tmpindex;
+            for (i2 = 0; i2 < sizeof(symbols); i2++)
+            {
+               for (j = 0;j < sizeof(symbols[i2].name);j++)
+               {
+                  if(symbols[i2].name[j] == symbole_name[j])
+                  {
+                     bool = TRUE;
+                  }else
+                  {
+                     bool = FALSE;
+                     break;
+                  }
+               }
+
+               if (bool)
+               {
+                  tmpindex = i2;
+               }
+            }
+
+            int sybol_address = symbols[tmpindex].address;
+         }
       }
       else
       {
-         if (is_r_to_r_case(i, input))
+         if (is_r_to_r_case(itmp, input))
          {
 
             d_code[0][1] = 5;
