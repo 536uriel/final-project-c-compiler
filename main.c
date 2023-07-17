@@ -495,6 +495,16 @@ int *opcode_case_to_binary(int iopcode, int i, char input[])
 
 int *directive_cases_to_binary(int i, char input[])
 {
+   if(isWordMatch(i,".data",input))
+   {
+      int j = i;
+      /*get index of the last number showing*/
+      while (isLetter(input[j]) == 0)
+      {
+         j++;
+      }
+      
+   }
 }
 
 /*end new code here*************************************** */
