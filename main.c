@@ -442,9 +442,6 @@ int *opcode_case_to_binary(int iopcode, int i, char input[])
       }
    }
 
-
-   /* to do: make 2 operands case! */
-
    if (opcode_group == 2)
    {
 
@@ -470,11 +467,29 @@ int *opcode_case_to_binary(int iopcode, int i, char input[])
       }
    }
 
+   if (opcode_group == 3)
+   {
+      d_code[0][1] = 0;
+      d_code[0][2] = iopcode;
+      d_code[0][3] = 0;
+
+      int j;
+
+      for (j = 0; j < 4; j++)
+      {
+         d_code[1][j] = -1;
+      }
+
+      for (j = 0; j < 4; j++)
+      {
+         d_code[2][j] = -1;
+      }
+   }
+
    return d_code;
 }
 
 /*new code here****************************************** */
-
 
 /*to do: */
 
