@@ -252,8 +252,6 @@ int isLetter(char c)
    }
 }
 
-/*new code here****************************************** */
-
 int is_r_to_r_case(int i, char input[])
 {
    if (input[i] == '@')
@@ -295,6 +293,46 @@ int get_opcode_group(int iopcode)
    {
       return 3;
    }
+}
+
+int get_symbol_address(int itmp, char input[])
+{
+   /*find the symbol address*/
+   int i2;
+   char symbole_name[20];
+   int symbolen = jumpToEndOfWord(itmp, input) - itmp;
+   for (i2 = 0; i2 < symbolen; i2++)
+   {
+      symbole_name[i2] = input[itmp];
+      itmp++;
+   }
+
+   int j;
+   int bool = FALSE;
+   int tmpindex;
+   for (i2 = 0; i2 < sizeof(symbols); i2++)
+   {
+      for (j = 0; j < sizeof(symbols[i2].name); j++)
+      {
+         if (symbols[i2].name[j] == symbole_name[j])
+         {
+            bool = TRUE;
+         }
+         else
+         {
+            bool = FALSE;
+            break;
+         }
+      }
+
+      if (bool)
+      {
+         tmpindex = i2;
+      }
+   }
+
+   int symbol_address = symbols[tmpindex].address;
+   return symbol_address;
 }
 
 int *opcode_case_to_binary(int iopcode, int i, char input[])
@@ -357,40 +395,6 @@ int *opcode_case_to_binary(int iopcode, int i, char input[])
          }
          else
          {
-            /*find the symbol address*/
-            char symbole_name[20];
-            int symbolen = jumpToEndOfWord(itmp, input) - itmp;
-            for (i2 = 0; i2 < symbolen; i2++)
-            {
-               symbole_name[i2] = input[itmp];
-               itmp++;
-            }
-
-            int j;
-            int bool = FALSE;
-            int tmpindex;
-            for (i2 = 0; i2 < sizeof(symbols); i2++)
-            {
-               for (j = 0; j < sizeof(symbols[i2].name); j++)
-               {
-                  if (symbols[i2].name[j] == symbole_name[j])
-                  {
-                     bool = TRUE;
-                  }
-                  else
-                  {
-                     bool = FALSE;
-                     break;
-                  }
-               }
-
-               if (bool)
-               {
-                  tmpindex = i2;
-               }
-            }
-
-            int sybol_address = symbols[tmpindex].address;
 
             /*case of opcode number,label*/
 
@@ -402,7 +406,7 @@ int *opcode_case_to_binary(int iopcode, int i, char input[])
             d_code[1][1] = 0;
             d_code[1][2] = 0;
 
-            d_code[2][0] = sybol_address;
+            d_code[2][0] = get_symbol_address(itmp, input);
             d_code[2][1] = 0;
             d_code[2][2] = 0;
          }
@@ -438,31 +442,39 @@ int *opcode_case_to_binary(int iopcode, int i, char input[])
       }
    }
 
+
    /* to do: make 2 operands case! */
 
    if (opcode_group == 2)
    {
 
-      /* to do - d_code[0][1] = ?;*/
-      d_code[0][2] = iopcode;
-      d_code[0][3] = 0;
-
-      int i2;
-      int j;
-      for (i2 = 2; i2 < 4; i2++)
+      if (input[itmp] == '@')
       {
-         for (j = 0; j < 4; j++)
-         {
-            d_code[i2][j] = -1;
-         }
+         d_code[0][1] = input[itmp + 2] - '0';
+         d_code[0][2] = iopcode;
+         d_code[0][3] = 0;
+      }
+      else
+      {
+         d_code[0][1] = get_symbol_address(itmp, input);
+         d_code[0][2] = iopcode;
+         d_code[0][3] = 0;
       }
 
-      i2 = 0;
-      j = 0;
+      /*ignore the last operand*/
+      int j;
+
+      for (j = 0; j < 4; j++)
+      {
+         d_code[2][j] = -1;
+      }
    }
 
    return d_code;
 }
+
+/*new code here****************************************** */
+
 
 /*to do: */
 
