@@ -338,7 +338,7 @@ int get_symbol_address(int itmp, char input[])
 int *opcode_case_to_binary(int iopcode, int i, char input[])
 {
    /*decode array in decimal*/
-   static int d_code[3][4];
+   static int d_code[4][4];
    d_code[0][0] = 0;
    int itmp = i;
 
@@ -370,7 +370,6 @@ int *opcode_case_to_binary(int iopcode, int i, char input[])
 
          int numoperand = toInt(cdigits);
 
-         /*to compleate.......*/
          itmp = skipBlank(itmp, input);
          itmp++;
          itmp = skipBlank(itmp, input);
@@ -486,14 +485,16 @@ int *opcode_case_to_binary(int iopcode, int i, char input[])
       }
    }
 
+   /*the last index of d_code is the index of the input itself*/
+   d_code[3][0] = itmp;
+
    return d_code;
 }
-
 
 int *directive_cases_to_binary(int i, char input[])
 {
    /*decode array in decimal*/
-   static int d_code[10];
+   static int d_code[11];
 
    if (isWordMatch(i, ".data", input))
    {
@@ -525,6 +526,9 @@ int *directive_cases_to_binary(int i, char input[])
          di++;
       }
 
+      /*the last index of d_code is the index of the input itself*/
+      d_code[10] = i;
+
       return d_code;
    }
 
@@ -532,14 +536,13 @@ int *directive_cases_to_binary(int i, char input[])
    {
       int strlength = jumpToEndOfWord(i, input) - i;
       int j;
-      for (j = 0;j < strlength;j++)
+      for (j = 0; j < strlength; j++)
       {
          d_code[j] = input[i];
          i++;
       }
    }
 }
-
 
 int main()
 {
@@ -681,16 +684,20 @@ int main()
    and we created macros  instances and replaced the instance
    with the insider code*/
 
+   /*test the array returned from function */
+   /* int *arr= test();
+   printf("%d",arr[0]); */
+
    /* to do: ignore after .extermn/entry label operands******************** */
 
    /*new code here****************************************** */
 
-
-
+   while (i2 < strlen(newInput))
+   {
+      
+   }
 
    /*end new code here*************************************** */
-
-
 
    return 1;
 }
