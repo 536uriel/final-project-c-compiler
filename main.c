@@ -693,7 +693,7 @@ int main()
    /*new code here****************************************** */
 
    /*convert newinput to binary*/
-   while (i2 < strlen(newInput))
+   while (i < strlen(newInput))
    {
    }
 
