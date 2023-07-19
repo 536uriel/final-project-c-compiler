@@ -489,25 +489,57 @@ int *opcode_case_to_binary(int iopcode, int i, char input[])
    return d_code;
 }
 
-/*new code here****************************************** */
-
-/*to do: */
 
 int *directive_cases_to_binary(int i, char input[])
 {
-   if(isWordMatch(i,".data",input))
+   /*decode array in decimal*/
+   static int d_code[10];
+
+   if (isWordMatch(i, ".data", input))
    {
-      int j = i;
-      /*get index of the last number showing*/
-      while (isLetter(input[j]) == 0)
+      i = jumpToEndOfWord(i, input);
+
+      int di = 0;
+
+      /*loop over the numbers until got to letter*/
+      while (isLetter(input[i]) == 0)
       {
-         j++;
+         i = skipBlank(i, input);
+         if (input[i] == ',')
+         {
+            i++;
+            i = skipBlank(i, input);
+         }
+         int numlen = jumpToEndOfWord(i, input) - i;
+         char num[numlen];
+         int j;
+         for (j = 0; j < numlen; j++)
+         {
+            num[j] = input[i];
+            i++;
+         }
+
+         int number = toInt(num);
+
+         d_code[di] = number;
+         di++;
       }
-      
+
+      return d_code;
+   }
+
+   if (isWordMatch(i, ".string", input))
+   {
+      int strlength = jumpToEndOfWord(i, input) - i;
+      int j;
+      for (j = 0;j < strlength;j++)
+      {
+         d_code[j] = input[i];
+         i++;
+      }
    }
 }
 
-/*end new code here*************************************** */
 
 int main()
 {
@@ -648,6 +680,17 @@ int main()
    we created array of symbol with there names and addresses
    and we created macros  instances and replaced the instance
    with the insider code*/
+
+   /* to do: ignore after .extermn/entry label operands******************** */
+
+   /*new code here****************************************** */
+
+
+
+
+   /*end new code here*************************************** */
+
+
 
    return 1;
 }
