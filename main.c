@@ -156,45 +156,10 @@ struct Mcro createMcro(int i, char input[])
    return m;
 }
 
-int isData(int i, char input[])
+int isDirective(int i, char input[])
 {
-   if (isWordMatch(i, ".data", input))
-   {
-      return TRUE;
-   }
-   else
-   {
-      return FALSE;
-   }
-}
-
-int isStringOperand(int i, char input[])
-{
-   if (isWordMatch(i, ".string", input))
-   {
-      return TRUE;
-   }
-   else
-   {
-      return FALSE;
-   }
-}
-
-int isEntry(int i, char input[])
-{
-   if (isWordMatch(i, ".entry", input))
-   {
-      return TRUE;
-   }
-   else
-   {
-      return FALSE;
-   }
-}
-
-int isExtern(int i, char input[])
-{
-   if (isWordMatch(i, ".extern", input))
+   if (isWordMatch(i, ".data", input) || isWordMatch(i, ".string", input) ||
+       isWordMatch(i, ".entry", input) || isWordMatch(i, ".extern", input))
    {
       return TRUE;
    }
@@ -335,7 +300,7 @@ int get_symbol_address(int itmp, char input[])
    return symbol_address;
 }
 
-int *opcode_case_to_binary(int iopcode, int i, char input[])
+int **opcode_case_to_binary(int iopcode, int i, char input[])
 {
    /*decode array in decimal*/
    static int d_code[4][4];
@@ -546,7 +511,7 @@ int *directive_cases_to_binary(int i, char input[])
 
 int main()
 {
-   /*to fix: scanf("%s", inputText);*/
+   scanf("%s", inputText);
 
    /*input index*/
    long i = 0;
@@ -678,6 +643,7 @@ int main()
 
    i2 = 0;
    mcroIndex = 0;
+   i = 0;
 
    /*until here summery:
    we created array of symbol with there names and addresses
@@ -693,9 +659,45 @@ int main()
    /*new code here****************************************** */
 
    /*convert newinput to binary*/
+
    while (i < strlen(newInput))
    {
+      i = skipBlank(i, newInput);
+
+      int iopcode = isOpCode(i, newInput);
+      if (iopcode)
+      {
+         int **d_code = opcode_case_to_binary(iopcode, i, newInput);
+         int x, y;
+         for (y = 0; y < sizeof(d_code); y++)
+         {
+            for (x = 0; x < sizeof(d_code[y]); x++)
+            {
+               printf("%d", d_code[y][x]);
+            }
+         }
+
+         i = d_code[3][0];
+      }
+      else
+      {
+         if (isDirective(i, newInput))
+         {
+            int *d_code = directive_cases_to_binary(i, newInput);
+            int x;
+            for (x = 0; x < sizeof(d_code); x++)
+            {
+               printf("%d", d_code[x]);
+            }
+         }
+         else
+         {
+            i = jumpToEndOfWord(i, inputText);
+         }
+      }
    }
+
+   printf("%s","done");
 
    /*end new code here*************************************** */
 
