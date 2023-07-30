@@ -11,8 +11,6 @@ char opcode[16][4] = {
     "not", "clr", "inc", "dec", "jmp", "bne", "red", "prn", "jsr",
     "rts", "stop"};
 
-char inputText[2000];
-
 struct Symbol
 {
    int address;
@@ -94,10 +92,13 @@ int isRegister(int i, char input[])
 
 int isSymbol(int i, char input[])
 {
-   while (input[i] != ' ')
+
+   /* to fix */
+   while (input[i] != ' ' & i < strlen(input))
    {
       i++;
    }
+
    if (input[i - 1] == ':')
    {
       return TRUE;
@@ -511,43 +512,38 @@ int *directive_cases_to_binary(int i, char input[])
 
 int main()
 {
-   scanf("%s", inputText);
+
+   char inputText[300] = "MAIN:            mov     @r3 ,LENGTH LOOP:  jmp L1   prn -5   bne LOOP   sub @r1, @r4   bne  END L1:  inc K   bne  LOOP    END:  stop STR:  .string  “abcdef” LENGTH: .data 6,-9,15 K:  .data 22 ";
 
    /*input index*/
-   long i = 0;
+   int i = 0;
    /*memory index*/
-   long mi = 0;
+   int mi = 0;
+   printf("%s", "start debug:");
 
    while (i < strlen(inputText))
    {
 
-      if (inputText[i] == ' ')
-      {
-         i = skipBlank(i, inputText);
-      }
-
-      if (inputText[i] == ',')
-      {
-         i++;
-      }
+      i = skipBlank(i, inputText);
 
       if (isSymbol(i, inputText))
       {
+         printf("%s", "symbol found");
 
-         int cnt = 0;
-         while (inputText[i] != ' ')
-         {
-            cnt++;
-         }
+         // int cnt = 0;
+         // while (inputText[i] != ' ')
+         // {
+         //    cnt++;
+         // }
 
-         int j;
-         for (j = 0; j < cnt; j++)
-         {
-            symbols[indexSymbols].name[j] = inputText[i + j];
-         }
+         // int j;
+         // for (j = 0; j < cnt; j++)
+         // {
+         //    symbols[indexSymbols].name[j] = inputText[i + j];
+         // }
 
-         symbols[indexSymbols].address = mi;
-         indexSymbols++;
+         // symbols[indexSymbols].address = mi;
+         // indexSymbols++;
       }
 
       i = jumpToEndOfWord(i, inputText);
@@ -558,146 +554,155 @@ int main()
 
    i = 0;
    mi = 0;
-   indexSymbols = 0;
+   // indexSymbols = 0;
+
+   // printf("%s","start testing");
+
+   // /*for testing*/
+   // for (i = 0; i < sizeof(symbols); i++)
+   // {
+   //    printf("%s", symbols[i].name);
+   //    printf("%d", symbols[i].address);
+   // }
 
    /* until here its first level of the compliler */
 
-   /*create macros*/
-   while (i < strlen(inputText))
-   {
-      if (inputText[i] == ' ')
-      {
-         i = skipBlank(i, inputText);
-      }
+   // /*create macros*/
+   // while (i < strlen(inputText))
+   // {
+   //    if (inputText[i] == ' ')
+   //    {
+   //       i = skipBlank(i, inputText);
+   //    }
 
-      if (inputText[i] == ',')
-      {
-         i++;
-      }
+   //    if (inputText[i] == ',')
+   //    {
+   //       i++;
+   //    }
 
-      if (isMcro(i, inputText))
-      {
-         /*jump after word mcro*/
-         i = jumpToEndOfWord(i, inputText);
-         i++;
+   //    if (isMcro(i, inputText))
+   //    {
+   //       /*jump after word mcro*/
+   //       i = jumpToEndOfWord(i, inputText);
+   //       i++;
 
-         mcros[mcroIndex] = createMcro(i, inputText);
-         mcroIndex++;
-         while (!isWordMatch(i, "endmcro", inputText))
-         {
-            i++;
-         }
-         /*jump after endmcro*/
-         i += 8;
-      }
-   }
+   //       mcros[mcroIndex] = createMcro(i, inputText);
+   //       mcroIndex++;
+   //       while (!isWordMatch(i, "endmcro", inputText))
+   //       {
+   //          i++;
+   //       }
+   //       /*jump after endmcro*/
+   //       i += 8;
+   //    }
+   // }
 
-   i = 0;
-   mcroIndex = 0;
+   // i = 0;
+   // mcroIndex = 0;
 
-   char newInput[2000];
-   int i2 = 0;
+   // char newInput[2000];
+   // int i2 = 0;
 
-   /*skip mcro code in new input text*/
-   while (i < strlen(inputText))
-   {
-      newInput[i2] = inputText[i];
+   // /*skip mcro code in new input text*/
+   // while (i < strlen(inputText))
+   // {
+   //    newInput[i2] = inputText[i];
 
-      if (isMcro(i, inputText))
-      {
-         /*skip mcro defenition code*/
-         while (!isWordMatch(i, "endmcro", inputText))
-         {
-            i++;
-         }
+   //    if (isMcro(i, inputText))
+   //    {
+   //       /*skip mcro defenition code*/
+   //       while (!isWordMatch(i, "endmcro", inputText))
+   //       {
+   //          i++;
+   //       }
 
-         i = jumpToEndOfWord(i, inputText);
-      }
+   //       i = jumpToEndOfWord(i, inputText);
+   //    }
 
-      i++;
-      i2++;
-   }
+   //    i++;
+   //    i2++;
+   // }
 
-   i = 0;
-   i2 = 0;
+   // i = 0;
+   // i2 = 0;
 
-   /*insert insider mcro code into mcro instances*/
-   while (i2 < strlen(newInput))
-   {
-      if (isWordMatch(i2, mcros[mcroIndex].name, newInput))
-      {
-         int lentmp = strlen(mcros[mcroIndex].str);
-         int itmp = 0;
-         while (itmp < lentmp)
-         {
-            newInput[i2] = mcros[mcroIndex].str[itmp];
-            i2++;
-            itmp++;
-         }
+   // /*insert insider mcro code into mcro instances*/
+   // while (i2 < strlen(newInput))
+   // {
+   //    if (isWordMatch(i2, mcros[mcroIndex].name, newInput))
+   //    {
+   //       int lentmp = strlen(mcros[mcroIndex].str);
+   //       int itmp = 0;
+   //       while (itmp < lentmp)
+   //       {
+   //          newInput[i2] = mcros[mcroIndex].str[itmp];
+   //          i2++;
+   //          itmp++;
+   //       }
 
-         mcroIndex++;
-      }
+   //       mcroIndex++;
+   //    }
 
-      i2++;
-   }
+   //    i2++;
+   // }
 
-   i2 = 0;
-   mcroIndex = 0;
-   i = 0;
+   // i2 = 0;
+   // mcroIndex = 0;
+   // i = 0;
 
-   /*until here summery:
-   we created array of symbol with there names and addresses
-   and we created macros  instances and replaced the instance
-   with the insider code*/
+   // /*until here summery:
+   // we created array of symbol with there names and addresses
+   // and we created macros  instances and replaced the instance
+   // with the insider code*/
 
-   /*test the array returned from function */
-   /* int *arr= test();
-   printf("%d",arr[0]); */
+   // /*test the array returned from function */
+   // /* int *arr= test();
+   // printf("%d",arr[0]); */
 
-   /* to do: ignore after .extermn/entry label operands******************** */
+   // /* to do: ignore after .extermn/entry label operands******************** */
 
-   /*new code here****************************************** */
+   // /*new code here****************************************** */
 
-   /*convert newinput to binary*/
+   // /*convert newinput to binary*/
 
-   while (i < strlen(newInput))
-   {
-      i = skipBlank(i, newInput);
+   // while (i < strlen(newInput))
+   // {
+   //    i = skipBlank(i, newInput);
 
-      int iopcode = isOpCode(i, newInput);
-      if (iopcode)
-      {
-         int **d_code = opcode_case_to_binary(iopcode, i, newInput);
-         int x, y;
-         for (y = 0; y < sizeof(d_code); y++)
-         {
-            for (x = 0; x < sizeof(d_code[y]); x++)
-            {
-               printf("%d", d_code[y][x]);
-            }
-         }
+   //    int iopcode = isOpCode(i, newInput);
+   //    if (iopcode)
+   //    {
+   //       int **d_code = opcode_case_to_binary(iopcode, i, newInput);
+   //       int x, y;
+   //       for (y = 0; y < sizeof(d_code); y++)
+   //       {
+   //          for (x = 0; x < sizeof(d_code[y]); x++)
+   //          {
+   //             printf("%d", d_code[y][x]);
+   //          }
+   //       }
 
-         i = d_code[3][0];
-      }
-      else
-      {
-         if (isDirective(i, newInput))
-         {
-            int *d_code = directive_cases_to_binary(i, newInput);
-            int x;
-            for (x = 0; x < sizeof(d_code); x++)
-            {
-               printf("%d", d_code[x]);
-            }
-         }
-         else
-         {
-            i = jumpToEndOfWord(i, inputText);
-         }
-      }
-   }
+   //       i = d_code[3][0];
+   //    }
+   //    else
+   //    {
+   //       if (isDirective(i, newInput))
+   //       {
+   //          int *d_code = directive_cases_to_binary(i, newInput);
+   //          int x;
+   //          for (x = 0; x < sizeof(d_code); x++)
+   //          {
+   //             printf("%d", d_code[x]);
+   //          }
+   //       }
+   //       else
+   //       {
+   //          i = jumpToEndOfWord(i, inputText);
+   //       }
+   //    }
+   // }
 
-   printf("%s","done");
+   // printf("%s","done");
 
    /*end new code here*************************************** */
 
