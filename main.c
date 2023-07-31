@@ -519,7 +519,7 @@ int main()
    int i = 0;
    /*memory index*/
    int mi = 0;
-   printf("%s", "start debug:");
+   printf("%s", "start debug: ");
 
    while (i < strlen(inputText))
    {
@@ -528,22 +528,21 @@ int main()
 
       if (isSymbol(i, inputText))
       {
-         printf("%s", "symbol found");
 
-         // int cnt = 0;
-         // while (inputText[i] != ' ')
-         // {
-         //    cnt++;
-         // }
+         int cnt = i;
+         while (inputText[cnt] != ' ')
+         {
+            cnt++;
+         }
 
-         // int j;
-         // for (j = 0; j < cnt; j++)
-         // {
-         //    symbols[indexSymbols].name[j] = inputText[i + j];
-         // }
+         int j;
+         for (j = 0; j < cnt; j++)
+         {
+            symbols[indexSymbols].name[j] = inputText[i + j];
+         }
 
-         // symbols[indexSymbols].address = mi;
-         // indexSymbols++;
+         symbols[indexSymbols].address = mi;
+         indexSymbols++;
       }
 
       i = jumpToEndOfWord(i, inputText);
@@ -554,6 +553,14 @@ int main()
 
    i = 0;
    mi = 0;
+
+   /*for testing*/
+   int j;
+   for (j = 0; j < (sizeof(symbols) / sizeof(symbols[0])); j++)
+   {
+      printf("%s",(symbols[j].name));
+      printf("%s","//");
+   }
    // indexSymbols = 0;
 
    // printf("%s","start testing");
