@@ -536,7 +536,8 @@ int main()
          }
 
          int j;
-         for (j = 0; j < cnt; j++)
+         /*cnt - i => the length of the symbol word*/
+         for (j = 0; j < cnt - i - 1; j++)
          {
             symbols[indexSymbols].name[j] = inputText[i + j];
          }
