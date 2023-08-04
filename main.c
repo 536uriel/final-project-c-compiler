@@ -147,7 +147,7 @@ struct Mcro createMcro(int i, char input[])
 
    while (!isWordMatch(i, "endmcro", input))
    {
-      printf("%s"," ");
+      printf("%s", " ");
       m.str[mindex] = input[i];
       i++;
       mindex++;
@@ -591,31 +591,58 @@ int main()
    i = 0;
    mcroIndex = 0;
 
-   // char newInput[2000];
-   // int i2 = 0;
+   char newInput[2000];
+   int i2 = 0;
 
-   // /*skip mcro code in new input text*/
-   // while (i < strlen(inputText))
-   // {
-   //    newInput[i2] = inputText[i];
+   /*skip mcro code in new input text*/
+   while (i < strlen(inputText))
+   {
+      printf("%c", ' ');
 
-   //    if (isMcro(i, inputText))
-   //    {
-   //       /*skip mcro defenition code*/
-   //       while (!isWordMatch(i, "endmcro", inputText))
-   //       {
-   //          i++;
-   //       }
+      if (isMcro(i, inputText))
+      {
+         /*skip mcro defenition*/
+         printf("%s", "skip mcro");
+         i = jumpToEndOfWord(i, inputText);
+         i = skipBlank(i, inputText);
 
-   //       i = jumpToEndOfWord(i, inputText);
-   //    }
+         /*put mcro name inside newInput*/
+         int mcroNameLen = jumpToEndOfWord(i, inputText) - i;
 
-   //    i++;
-   //    i2++;
-   // }
+         for (j = 0; j < mcroNameLen; j++)
+         {
+            newInput[i2] = inputText[i];
+            i++;
+            i2++;
+         }
 
-   // i = 0;
-   // i2 = 0;
+         /*skip mcro str code*/
+         while (!isWordMatch(i, "endmcro", inputText))
+         {
+            printf("%c",' ');
+            i++;
+         }
+
+         i = jumpToEndOfWord(i, inputText);
+      }
+
+      newInput[i2] = inputText[i];
+
+      i++;
+      i2++;
+   }
+
+   i = 0;
+   i2 = 0;
+
+   /*for testing*/
+   while (i < strlen(newInput))
+   {
+      printf("%c", newInput[i]);
+      i++;
+   }
+
+   i = 0;
 
    // /*insert insider mcro code into mcro instances*/
    // while (i2 < strlen(newInput))
