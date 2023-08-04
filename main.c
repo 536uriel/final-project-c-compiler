@@ -619,7 +619,7 @@ int main()
          /*skip mcro str code*/
          while (!isWordMatch(i, "endmcro", inputText))
          {
-            printf("%c",' ');
+            printf("%c", ' ');
             i++;
          }
 
@@ -634,6 +634,40 @@ int main()
 
    i = 0;
    i2 = 0;
+   mcroIndex = 0;
+   /*to do:*/
+   // char newInput2[2000];
+
+   /*to fix*/
+   // /*insert insider mcro code into mcro instances*/
+   while (i2 < strlen(newInput))
+   {
+      printf("%c",' ');
+      if (isWordMatch(i2, mcros[mcroIndex].name, newInput) && strlen(mcros[mcroIndex].name) > 0)
+      {
+         int lentmp = strlen(mcros[mcroIndex].str);
+         int itmp = 0;
+         /*skip mcro name*/
+         i2 = jumpToEndOfWord(i2,newInput);
+
+         while (itmp < lentmp)
+         {
+            
+            newInput[i2] = mcros[mcroIndex].str[itmp];
+            i2++;
+            itmp++;
+         }
+
+         mcroIndex++;
+      }
+
+      /*to do: need to make the insert with new input variable*/
+      i2++;
+   }
+
+   i2 = 0;
+   mcroIndex = 0;
+   i = 0;
 
    /*for testing*/
    while (i < strlen(newInput))
@@ -643,30 +677,6 @@ int main()
    }
 
    i = 0;
-
-   // /*insert insider mcro code into mcro instances*/
-   // while (i2 < strlen(newInput))
-   // {
-   //    if (isWordMatch(i2, mcros[mcroIndex].name, newInput))
-   //    {
-   //       int lentmp = strlen(mcros[mcroIndex].str);
-   //       int itmp = 0;
-   //       while (itmp < lentmp)
-   //       {
-   //          newInput[i2] = mcros[mcroIndex].str[itmp];
-   //          i2++;
-   //          itmp++;
-   //       }
-
-   //       mcroIndex++;
-   //    }
-
-   //    i2++;
-   // }
-
-   // i2 = 0;
-   // mcroIndex = 0;
-   // i = 0;
 
    // /*until here summery:
    // we created array of symbol with there names and addresses
