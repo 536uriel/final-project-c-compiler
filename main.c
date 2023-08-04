@@ -132,23 +132,22 @@ int isMcro(int i, char input[])
 struct Mcro createMcro(int i, char input[])
 {
    static struct Mcro m;
+   i = jumpToEndOfWord(i, input);
+   i = skipBlank(i, input);
+   int iname = 0;
+   /*add mcro name*/
+   while (input[i] != ' ')
+   {
+      m.name[iname] = input[i];
+      iname++;
+      i++;
+   }
+
    int mindex = 0;
+
    while (!isWordMatch(i, "endmcro", input))
    {
-      /*add mcro name*/
-      i = jumpToEndOfWord(i, input);
-      i++;
-      i = skipBlank(i, input);
-      int iname = 0;
-      while (input[i] != ' ')
-      {
-         m.name[iname] = input[i];
-         iname++;
-         i++;
-      }
-
-      i++;
-
+      printf("%s"," ");
       m.str[mindex] = input[i];
       i++;
       mindex++;
@@ -513,7 +512,7 @@ int *directive_cases_to_binary(int i, char input[])
 int main()
 {
 
-   char inputText[300] = "MAIN:            mov     @r3 ,LENGTH LOOP:  jmp L1   prn -5   bne LOOP   sub @r1, @r4   bne  END L1:  inc K   bne  LOOP    END:  stop STR:  .string  “abcdef” LENGTH: .data 6,-9,15 K:  .data 22 ";
+   char inputText[300] = "MAIN:            mov     @r3 , LENGTH LOOP:  jmp L1  mcro m1 prn -5   bne LOOP endmcro   sub @r1, @r4   bne  END L1:  inc K   bne  LOOP    END:  stop STR:  .string  “abcdef” LENGTH: .data 6,-9,15 K:  .data 22 ";
 
    /*input index*/
    int i = 0;
@@ -559,54 +558,38 @@ int main()
    int j;
    for (j = 0; j < (sizeof(symbols) / sizeof(symbols[0])); j++)
    {
-      printf("%s",(symbols[j].name));
-      printf("%s","//");
+      printf("%s", (symbols[j].name));
+      printf("%s", "/");
    }
-   // indexSymbols = 0;
-
-   // printf("%s","start testing");
-
-   // /*for testing*/
-   // for (i = 0; i < sizeof(symbols); i++)
-   // {
-   //    printf("%s", symbols[i].name);
-   //    printf("%d", symbols[i].address);
-   // }
+   indexSymbols = 0;
 
    /* until here its first level of the compliler */
-
    // /*create macros*/
-   // while (i < strlen(inputText))
-   // {
-   //    if (inputText[i] == ' ')
-   //    {
-   //       i = skipBlank(i, inputText);
-   //    }
+   while (i < strlen(inputText))
+   {
+      i = skipBlank(i, inputText);
 
-   //    if (inputText[i] == ',')
-   //    {
-   //       i++;
-   //    }
+      printf("%c", ' ');
 
-   //    if (isMcro(i, inputText))
-   //    {
-   //       /*jump after word mcro*/
-   //       i = jumpToEndOfWord(i, inputText);
-   //       i++;
+      if (isMcro(i, inputText))
+      {
+         printf("%s", "is mcro");
+         // /*jump after word mcro*/
+         i = jumpToEndOfWord(i, inputText);
 
-   //       mcros[mcroIndex] = createMcro(i, inputText);
-   //       mcroIndex++;
-   //       while (!isWordMatch(i, "endmcro", inputText))
-   //       {
-   //          i++;
-   //       }
-   //       /*jump after endmcro*/
-   //       i += 8;
-   //    }
-   // }
+         mcros[mcroIndex] = createMcro(i, inputText);
+         mcroIndex++;
+      }
 
-   // i = 0;
-   // mcroIndex = 0;
+      i = jumpToEndOfWord(i, inputText);
+   }
+
+   /*for testing mcros*/
+   printf("%s", mcros[0].name);
+   printf("%s", mcros[0].str);
+
+   i = 0;
+   mcroIndex = 0;
 
    // char newInput[2000];
    // int i2 = 0;
