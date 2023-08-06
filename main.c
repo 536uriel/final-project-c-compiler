@@ -635,34 +635,35 @@ int main()
    i = 0;
    i2 = 0;
    mcroIndex = 0;
-   /*to do:*/
-   // char newInput2[2000];
+   char newInput2[2000];
 
-   /*to fix*/
-   // /*insert insider mcro code into mcro instances*/
-   while (i2 < strlen(newInput))
+   /*insert insider mcro code into mcro instances*/
+   while (i2 < (sizeof(newInput2) / sizeof(newInput2[0])))
    {
-      printf("%c",' ');
-      if (isWordMatch(i2, mcros[mcroIndex].name, newInput) && strlen(mcros[mcroIndex].name) > 0)
+      printf("%c", ' ');
+      if (isWordMatch(i, mcros[mcroIndex].name, newInput) && strlen(mcros[mcroIndex].name) > 0)
       {
          int lentmp = strlen(mcros[mcroIndex].str);
          int itmp = 0;
-         /*skip mcro name*/
-         i2 = jumpToEndOfWord(i2,newInput);
 
          while (itmp < lentmp)
          {
-            
-            newInput[i2] = mcros[mcroIndex].str[itmp];
+
+            newInput2[i2] = mcros[mcroIndex].str[itmp];
             i2++;
             itmp++;
          }
 
+         i = i2;
+
          mcroIndex++;
       }
-
-      /*to do: need to make the insert with new input variable*/
-      i2++;
+      else
+      {
+         newInput2[i2] = newInput[i];
+         i++;
+         i2++;
+      }
    }
 
    i2 = 0;
@@ -670,9 +671,9 @@ int main()
    i = 0;
 
    /*for testing*/
-   while (i < strlen(newInput))
+   while (i < strlen(newInput2))
    {
-      printf("%c", newInput[i]);
+      printf("%c", newInput2[i]);
       i++;
    }
 
