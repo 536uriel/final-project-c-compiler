@@ -1,4 +1,5 @@
 .vscode
 חוברת הקורס (8).pdf
-input.text
 output/main
+test.c
+output/test.dSYM

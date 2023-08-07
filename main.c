@@ -43,6 +43,7 @@ int jumpToEndOfWord(int i, char input[])
 int isWordMatch(int i, char word[], char input[])
 {
    int index;
+
    for (index = 0; index < strlen(word); index++)
    {
       if (input[i] != word[index])
@@ -52,6 +53,7 @@ int isWordMatch(int i, char word[], char input[])
 
       if (index == strlen(word))
       {
+
          return TRUE;
       }
 
@@ -61,13 +63,15 @@ int isWordMatch(int i, char word[], char input[])
 
 int isOpCode(int i, char input[])
 {
+
    int x;
-   for (x = 0; x < sizeof(opcode); x++)
+   for (x = 0; x < (sizeof(opcode) / sizeof(opcode[0])); x++)
    {
-      if (isWordMatch(i, opcode[x], input) == 1)
+      if (isWordMatch(i, opcode[x], input))
       {
          return x;
       }
+      printf("%c", ' ');
    }
 
    return -1;
@@ -452,6 +456,15 @@ int **opcode_case_to_binary(int iopcode, int i, char input[])
 
    /*the last index of d_code is the index of the input itself*/
    d_code[3][0] = itmp;
+   int x;
+   int y;
+   for (x = 0; x < 4; x++)
+   {
+      for (y = 0; y < 4; y++)
+      {
+         printf("%d", d_code[x][y]);
+      }
+   }
 
    return d_code;
 }
@@ -513,6 +526,7 @@ int main()
 {
 
    char inputText[300] = "MAIN:            mov     @r3 , LENGTH LOOP:  jmp L1  mcro m1 prn -5   bne LOOP endmcro   sub @r1, @r4   bne  END L1:  inc K   bne  LOOP    END:  stop STR:  .string  “abcdef” LENGTH: .data 6,-9,15 K:  .data 22 ";
+
 
    /*input index*/
    int i = 0;
@@ -677,8 +691,6 @@ int main()
       i++;
    }
 
-   i = 0;
-
    // /*until here summery:
    // we created array of symbol with there names and addresses
    // and we created macros  instances and replaced the instance
@@ -694,44 +706,50 @@ int main()
 
    // /*convert newinput to binary*/
 
-   // while (i < strlen(newInput))
-   // {
-   //    i = skipBlank(i, newInput);
+   /* to fix */
 
-   //    int iopcode = isOpCode(i, newInput);
-   //    if (iopcode)
-   //    {
-   //       int **d_code = opcode_case_to_binary(iopcode, i, newInput);
-   //       int x, y;
-   //       for (y = 0; y < sizeof(d_code); y++)
-   //       {
-   //          for (x = 0; x < sizeof(d_code[y]); x++)
-   //          {
-   //             printf("%d", d_code[y][x]);
-   //          }
-   //       }
+   i = 0;
 
-   //       i = d_code[3][0];
-   //    }
-   //    else
-   //    {
-   //       if (isDirective(i, newInput))
-   //       {
-   //          int *d_code = directive_cases_to_binary(i, newInput);
-   //          int x;
-   //          for (x = 0; x < sizeof(d_code); x++)
-   //          {
-   //             printf("%d", d_code[x]);
-   //          }
-   //       }
-   //       else
-   //       {
-   //          i = jumpToEndOfWord(i, inputText);
-   //       }
-   //    }
-   // }
+   while (i < strlen(newInput2))
+   {
+      printf("%c", ' ');
+      i = skipBlank(i, newInput2);
 
-   // printf("%s","done");
+      int iopcode = isOpCode(i, newInput2);
+      if (iopcode != -1)
+      {
+         printf("%d", iopcode);
+         opcode_case_to_binary(iopcode, i, newInput2);
+
+         // int x, y;
+         // for (y = 0; y < (sizeof(opcode_case_to_binary(iopcode, i, newInput2))/sizeof(opcode_case_to_binary(iopcode, i, newInput2)[0])); y++)
+         // {
+         //    for (x = 0; x < (sizeof(opcode_case_to_binary(iopcode, i, newInput2)[y])/sizeof(opcode_case_to_binary(iopcode, i, newInput2)[y][0])); x++)
+         //    {
+         //       printf("%d", opcode_case_to_binary(iopcode, i, newInput2)[y][x]);
+         //    }
+         // }
+
+         // i = opcode_case_to_binary(iopcode, i, newInput2)[3][0];
+      }
+      // else
+      // {
+      //    if (isDirective(i, newInput2))
+      //    {
+      //       int *d_code = directive_cases_to_binary(i, newInput2);
+      //       int x;
+      //       for (x = 0; x < sizeof(d_code); x++)
+      //       {
+      //          printf("%d", d_code[x]);
+      //       }
+      //    }
+      //    else
+      //    {
+      //       i = jumpToEndOfWord(i, newInput2);
+      //    }
+      // }
+      i = jumpToEndOfWord(i, newInput2);
+   }
 
    /*end new code here*************************************** */
 
