@@ -758,6 +758,9 @@ int main()
 
    i = 0;
 
+   char d_code[1000][12];
+   int dindex = 0;
+
    while (i < strlen(newInput2))
    {
       printf("%c", ' ');
@@ -765,20 +768,21 @@ int main()
 
       int iopcode = isOpCode(i, newInput2);
       if (iopcode != -1)
-      {
-         printf("%d", iopcode);
-         opcode_case_to_binary(iopcode, i, newInput2);
+      {   
+         /*skip opcode word*/
+         i = jumpToEndOfWord(i,newInput2);
+         i = skipBlank(i,newInput2);     
 
-         // int x, y;
-         // for (y = 0; y < (sizeof(opcode_case_to_binary(iopcode, i, newInput2))/sizeof(opcode_case_to_binary(iopcode, i, newInput2)[0])); y++)
-         // {
-         //    for (x = 0; x < (sizeof(opcode_case_to_binary(iopcode, i, newInput2)[y])/sizeof(opcode_case_to_binary(iopcode, i, newInput2)[y][0])); x++)
-         //    {
-         //       printf("%d", opcode_case_to_binary(iopcode, i, newInput2)[y][x]);
-         //    }
-         // }
+         int opcode_group = get_opcode_group(iopcode);
+         if (opcode_group == 1)
+         {
+            if (isDigit(newInput2[i]))
+            {
+               char *strnum;
+               
+            }
+         }
 
-         // i = opcode_case_to_binary(iopcode, i, newInput2)[3][0];
       }
       // else
       // {
@@ -801,5 +805,5 @@ int main()
 
    /*end new code here*************************************** */
 
-   return 1;
+   return 0;
 }
