@@ -1,10 +1,63 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
+#include "limits.h";
 #include "to-binary.c"
 
 #define FALSE 0;
 #define TRUE 1;
+
+char *readFileToString(const char *filename)
+{
+
+   char *cwd;
+   char buff[PATH_MAX + 1];
+
+   cwd = getcwd(buff, PATH_MAX + 1);
+   if (cwd != NULL)
+   {
+      printf("Current working directory: %s\n", cwd);
+
+      // If you have a file name, say "myfile.txt" in the current directory,
+      // you can create its full path as follows:
+      char full_path[PATH_MAX + 1];
+      snprintf(full_path, sizeof(full_path), "%s/%s", cwd, filename);
+      printf("Full path: %s\n", full_path);
+
+      FILE *file = fopen(filename, "r"); // Open the file in read mode
+      if (!file)
+      {
+         perror(filename);
+         return NULL; // If file does not exist, return NULL
+      }
+
+      // Determine the size of the file
+      fseek(file, 0, SEEK_END);
+      long length = ftell(file);
+      fseek(file, 0, SEEK_SET);
+
+      // Allocate memory for the string, including the null terminator
+      char *content = (char *)malloc(length + 1);
+      if (!content)
+      {
+         fclose(file);
+         return NULL; // Failed to allocate memory
+      }
+
+      // Read the file into the allocated memory
+      fread(content, 1, length, file);
+      content[length] = '\0'; // Null-terminate the string
+
+      fclose(file);
+      return content;
+   }
+   else
+   {
+      perror("error");
+      exit(0);
+   }
+}
 
 char opcode[16][4] = {
     "mov", "cmp", "add", "sub", "lea",
@@ -525,9 +578,7 @@ int *directive_cases_to_binary(int i, char input[])
 int main()
 {
 
-   char inputText[300] = "MAIN:            mov     @r3 , LENGTH LOOP:  jmp L1  mcro m1 prn -5   bne LOOP endmcro   sub @r1, @r4   bne  END L1:  inc K   bne  LOOP    END:  stop STR:  .string  “abcdef” LENGTH: .data 6,-9,15 K:  .data 22 ";
-
-
+   char *inputText = readFileToString("input.txt");
    /*input index*/
    int i = 0;
    /*memory index*/
@@ -620,16 +671,6 @@ int main()
          i = jumpToEndOfWord(i, inputText);
          i = skipBlank(i, inputText);
 
-         /*put mcro name inside newInput*/
-         int mcroNameLen = jumpToEndOfWord(i, inputText) - i;
-
-         for (j = 0; j < mcroNameLen; j++)
-         {
-            newInput[i2] = inputText[i];
-            i++;
-            i2++;
-         }
-
          /*skip mcro str code*/
          while (!isWordMatch(i, "endmcro", inputText))
          {
@@ -651,32 +692,37 @@ int main()
    mcroIndex = 0;
    char newInput2[2000];
 
-   /*insert insider mcro code into mcro instances*/
-   while (i2 < (sizeof(newInput2) / sizeof(newInput2[0])))
+   for (mcroIndex = 0; mcroIndex < (sizeof(mcros) / sizeof(mcros[0])); mcroIndex++)
    {
-      printf("%c", ' ');
-      if (isWordMatch(i, mcros[mcroIndex].name, newInput) && strlen(mcros[mcroIndex].name) > 0)
+      /*insert insider mcro code into mcro instances*/
+      while (i2 < (sizeof(newInput2) / sizeof(newInput2[0])))
       {
-         int lentmp = strlen(mcros[mcroIndex].str);
-         int itmp = 0;
 
-         while (itmp < lentmp)
+         printf("%c", ' ');
+         if (isWordMatch(i, mcros[mcroIndex].name, newInput) && strlen(mcros[mcroIndex].name) > 0)
          {
+            printf("%s", "mcro found: ");
+            printf("%s", mcros[mcroIndex].name);
+            int lentmp = strlen(mcros[mcroIndex].str);
+            int itmp = 0;
 
-            newInput2[i2] = mcros[mcroIndex].str[itmp];
-            i2++;
-            itmp++;
+            while (itmp < lentmp)
+            {
+
+               newInput2[i2] = mcros[mcroIndex].str[itmp];
+               i2++;
+               itmp++;
+            }
+
+            /*skip mcro name in last input*/
+            i = jumpToEndOfWord(i, newInput);
          }
-
-         i = i2;
-
-         mcroIndex++;
-      }
-      else
-      {
-         newInput2[i2] = newInput[i];
-         i++;
-         i2++;
+         else
+         {
+            newInput2[i2] = newInput[i];
+            i++;
+            i2++;
+         }
       }
    }
 
@@ -690,6 +736,8 @@ int main()
       printf("%c", newInput2[i]);
       i++;
    }
+
+   i = 0;
 
    // /*until here summery:
    // we created array of symbol with there names and addresses
