@@ -8,6 +8,35 @@
 #define FALSE 0;
 #define TRUE 1;
 
+int *decimalToBinary(int n, int arrsize)
+{
+   if (n == 0)
+   {
+      char *result = (char *)malloc(2); // 1 character for '0' and 1 for the null terminator
+      result[0] = '0';
+      result[1] = '\0';
+      return result;
+   }
+
+   int *binary = (int *)malloc(arrsize); // count for binary representation
+
+   int index = arrsize;
+   while (n > 0)
+   {
+      binary[index] = (n % 2);
+      n /= 2;
+      index--;
+   }
+
+   while (index >= 0)
+   {
+      binary[index] = 0;
+      index--;
+   }
+
+   return binary;
+}
+
 char *readFileToString(const char *filename)
 {
 
@@ -758,7 +787,7 @@ int main()
 
    i = 0;
 
-   char d_code[1000][12];
+   int d_code[1000][12];
    int dindex = 0;
 
    while (i < strlen(newInput2))
@@ -768,21 +797,110 @@ int main()
 
       int iopcode = isOpCode(i, newInput2);
       if (iopcode != -1)
-      {   
-         /*skip opcode word*/
-         i = jumpToEndOfWord(i,newInput2);
-         i = skipBlank(i,newInput2);     
+      {
 
+         d_code[dindex][0] = 0;
+         d_code[dindex][1] = 0;
+         /*skip opcode word*/
+         i = jumpToEndOfWord(i, newInput2);
+         i = skipBlank(i, newInput2);
+
+         /* !!!impotant: the comma between operands needs to take in concidere here */
          int opcode_group = get_opcode_group(iopcode);
          if (opcode_group == 1)
          {
+
             if (isDigit(newInput2[i]))
             {
-               char *strnum;
-               
+
+               int *binary_opcode = decimalToBinary(iopcode, 4);
+
+               int itmp;
+               int itmp2 = 0;
+               int len = strlen(binary_opcode);
+
+               for (itmp = 5; itmp < 9; itmp++)
+               {
+
+                  d_code[dindex][itmp] = binary_opcode[itmp2];
+
+                  itmp2++;
+               }
+
+               d_code[dindex][9] = 1;
+               d_code[dindex][10] = 0;
+               d_code[dindex][11] = 0;
+
+               dindex++;
+
+               char strnum[10];
+               itmp2 = 0;
+               while (isDigit(newInput2[i]))
+               {
+                  strnum[itmp] = newInput2[i];
+                  itmp++;
+                  i++;
+               }
+
+               int n = toInt(strnum);
+               int *num = decimalToBinary(n, 10);
+
+               itmp = 0;
+               itmp2 = 2;
+
+               for (itmp = 0; itmp < 10; itmp++)
+               {
+                  d_code[dindex][itmp2] = num[itmp];
+               }
+
+               /*skip the comma letter and get to next operand*/
+               i = skipBlank(i, newInput2);
+               i++;
+               i = skipBlank(i, newInput2);
+
+               /* distinguish the decoding for the opcode operand in sibits 2 - 4
+               if the scond operand is a regiter or a label */
+               dindex--;
+               if (newInput2[i] == '@')
+               {
+                  /*register case*/
+                  d_code[dindex][2] = 1;
+                  d_code[dindex][3] = 0;
+                  d_code[dindex][4] = 1;
+
+                  /*get to the third operand*/
+                  dindex += 2;
+
+                  i += 2;
+                  int rnum = newInput2[i] - '0';
+
+                  itmp = 0;
+                  for (itmp = 0; itmp < 7; itmp++)
+                  {
+                     d_code[dindex][itmp] = 0;
+                  }
+
+                  int *binarynum = decimalToBinary(rnum, 4);
+
+                  itmp2 = 0;
+                  for (itmp = 7; itmp < 12; itmp++)
+                  {
+                     d_code[dindex][itmp] = binarynum[itmp2];
+                  }
+                  
+               }
+               else
+               {
+                  /*label case*/
+                  d_code[dindex][2] = 1;
+                  d_code[dindex][3] = 1;
+                  d_code[dindex][4] = 0;
+
+                  /*get to the third operand*/
+                  dindex += 2;
+               }
             }
          }
-
       }
       // else
       // {
