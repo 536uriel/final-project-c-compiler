@@ -102,6 +102,35 @@ struct Symbol
 struct Symbol symbols[100];
 int indexSymbols = 0;
 
+int getSymbolIndex(char symbol[])
+{
+   int i = 0;
+   int i2 = 0;
+   int bol = TRUE;
+   for (i = 0; i < (sizeof(symbols) / sizeof(symbols[0])); i++)
+   {
+      if (strlen(symbols[i].name) == strlen(symbol))
+      {
+         bol = TRUE;
+         for (i2 = 0; i2 < strlen(symbols[i].name); i2++)
+         {
+            if (symbols[i].name[i2] != symbol[i2])
+            {
+               bol = FALSE;
+               break;
+            }
+         }
+
+         if (bol)
+         {
+            return i;
+         }
+      }
+   }
+
+   return -1;
+}
+
 int skipBlank(int i, char input[])
 {
    while (input[i] == ' ')
@@ -887,7 +916,6 @@ int main()
                   {
                      d_code[dindex][itmp] = binarynum[itmp2];
                   }
-                  
                }
                else
                {
@@ -898,6 +926,27 @@ int main()
 
                   /*get to the third operand*/
                   dindex += 2;
+                  int itmp = i;
+                  i = jumpToEndOfWord(i, newInput2);
+                  int labelen = i - itmp;
+                  char label[labelen];
+
+                  for (itmp2 = 0; itmp2 < labelen; itmp2++)
+                  {
+                     label[itmp2] = newInput2[itmp];
+                     itmp++;
+                  }
+
+                  int sindex = getSymbolIndex(label);
+                  int *num = decimalToBinary(symbols[sindex].address, 10);
+
+                  itmp = 0;
+                  itmp2 = 2;
+
+                  for (itmp = 0; itmp < 10; itmp++)
+                  {
+                     d_code[dindex][itmp2] = num[itmp];
+                  }
                }
             }
          }
