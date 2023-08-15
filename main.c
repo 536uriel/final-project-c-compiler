@@ -17,7 +17,7 @@ int *decimalToBinary(int num, int size)
 
    // Initialize the array with zeros
    for (int i = 0; i < size; i++)
-   {      
+   {
       binaryArray[i] = 0;
    }
 
@@ -25,7 +25,7 @@ int *decimalToBinary(int num, int size)
    int binarySize = 0;
    int numTmp = num;
    while (numTmp > 0)
-   {     
+   {
       numTmp = numTmp / 2;
       binarySize++;
    }
@@ -972,6 +972,8 @@ int main()
                /*if the 3 operand is a register*/
                if (newInput2[i] == '@')
                {
+                  printf("%s", "got to register to register case");
+
                   i += 2;
                   int rnum2 = newInput2[i] - '0';
                   /*get after register*/
@@ -1018,6 +1020,8 @@ int main()
                }
                else
                {
+                  printf("%s", "got to regiter to label case");
+
                   /*if the 3 operand is a label*/
                   /*get label string*/
                   int itmp = i;
@@ -1078,6 +1082,7 @@ int main()
             else
             {
                /*the sccond operand is a label*/
+               printf("%s", "got to label case");
 
                /*label case*/
                d_code[dindex][2] = 1;
@@ -1184,22 +1189,14 @@ int main()
    int y;
    int x;
 
-   for (y = 0; y < 1000; y++)
+   for (y = 0; y < dindex; y++)
    {
       for (x = 0; x < 12; x++)
       {
-         if (d_code[y][x])
-         {
-            printf("%d",d_code[y][x]);
-         }
-         else
-         {
-            printf("%c", ' ');
-         }
+         printf("%d", d_code[y][x]);
       }
-      printf("%c",' ');
+      printf("%c", ' ');
    }
-
 
    /*end new code here*************************************** */
 
