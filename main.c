@@ -8,33 +8,37 @@
 #define FALSE 0;
 #define TRUE 1;
 
-int *decimalToBinary(int n, int arrsize)
+int *decimalToBinary(int num, int size)
 {
-   if (n == 0)
-   {
-      char *result = (char *)malloc(2); // 1 character for '0' and 1 for the null terminator
-      result[0] = '0';
-      result[1] = '\0';
-      return result;
+
+   static int *binaryArray;
+
+   binaryArray = (int *)malloc(size * sizeof(int));
+
+   // Initialize the array with zeros
+   for (int i = 0; i < size; i++)
+   {      
+      binaryArray[i] = 0;
    }
 
-   int *binary = (int *)malloc(arrsize); // count for binary representation
-
-   int index = arrsize;
-   while (n > 0)
-   {
-      binary[index] = (n % 2);
-      n /= 2;
-      index--;
+   // determine the binary suze
+   int binarySize = 0;
+   int numTmp = num;
+   while (numTmp > 0)
+   {     
+      numTmp = numTmp / 2;
+      binarySize++;
    }
 
+   // Convert the number to binary and store in the array
+   int index = binarySize - 1;
    while (index >= 0)
    {
-      binary[index] = 0;
+      binaryArray[index] = num % 2;
+      num = num / 2;
       index--;
    }
-
-   return binary;
+   return binaryArray;
 }
 
 char *readFileToString(const char *filename)
@@ -846,7 +850,6 @@ int main()
 
                int itmp;
                int itmp2 = 0;
-               int len = strlen(binary_opcode);
 
                for (itmp = 5; itmp < 9; itmp++)
                {
@@ -949,6 +952,213 @@ int main()
                   }
                }
             }
+
+            /*if the sccond operand is not a number
+            check if it is a register or label*/
+
+            /*if the scond operand is a register*/
+            if (newInput2[i] == '@')
+            {
+               i += 2;
+               int rnum1 = newInput2[i] - '0';
+               /*get after register*/
+               i++;
+
+               /*skip the comma letter and get to next operand*/
+               i = skipBlank(i, newInput2);
+               i++;
+               i = skipBlank(i, newInput2);
+
+               /*if the 3 operand is a register*/
+               if (newInput2[i] == '@')
+               {
+                  i += 2;
+                  int rnum2 = newInput2[i] - '0';
+                  /*get after register*/
+                  i++;
+
+                  /*register to register case*/
+                  /*register case*/
+                  d_code[dindex][2] = 1;
+                  d_code[dindex][3] = 0;
+                  d_code[dindex][4] = 1;
+
+                  /*opcode case*/
+                  int *binaryopcode = decimalToBinary(iopcode, 4);
+
+                  d_code[dindex][5] = binaryopcode[0];
+                  d_code[dindex][6] = binaryopcode[1];
+                  d_code[dindex][7] = binaryopcode[2];
+                  d_code[dindex][8] = binaryopcode[3];
+
+                  /*register case*/
+                  d_code[dindex][9] = 1;
+                  d_code[dindex][10] = 0;
+                  d_code[dindex][11] = 1;
+
+                  /*dcoding the registers*/
+                  dindex++;
+                  d_code[dindex][0] = 0;
+                  d_code[dindex][1] = 1;
+
+                  int *binaryRNum1 = decimalToBinary(rnum1, 5);
+                  int *binaryRNum2 = decimalToBinary(rnum2, 5);
+
+                  d_code[dindex][2] = binaryRNum1[0];
+                  d_code[dindex][3] = binaryRNum1[1];
+                  d_code[dindex][4] = binaryRNum1[2];
+                  d_code[dindex][5] = binaryRNum1[3];
+                  d_code[dindex][6] = binaryRNum1[4];
+
+                  d_code[dindex][7] = binaryRNum2[0];
+                  d_code[dindex][8] = binaryRNum2[1];
+                  d_code[dindex][9] = binaryRNum2[2];
+                  d_code[dindex][10] = binaryRNum2[3];
+                  d_code[dindex][11] = binaryRNum2[4];
+               }
+               else
+               {
+                  /*if the 3 operand is a label*/
+                  /*get label string*/
+                  int itmp = i;
+                  i = jumpToEndOfWord(i, newInput2);
+                  int labelen = i - itmp;
+                  char label[labelen];
+                  int itmp2;
+                  for (itmp2 = 0; itmp2 < labelen; itmp2++)
+                  {
+                     label[itmp2] = newInput2[itmp];
+                     itmp++;
+                  }
+
+                  /*decode register to label case*/
+
+                  /*register case*/
+                  d_code[dindex][2] = 1;
+                  d_code[dindex][3] = 0;
+                  d_code[dindex][4] = 1;
+
+                  /*opcode case*/
+                  int *binaryopcode = decimalToBinary(iopcode, 4);
+
+                  d_code[dindex][5] = binaryopcode[0];
+                  d_code[dindex][6] = binaryopcode[1];
+                  d_code[dindex][7] = binaryopcode[2];
+                  d_code[dindex][8] = binaryopcode[3];
+
+                  /*label case*/
+                  d_code[dindex][9] = 1;
+                  d_code[dindex][10] = 1;
+                  d_code[dindex][11] = 0;
+
+                  /*decode the register operand*/
+                  dindex++;
+                  itmp2 = 2;
+                  int *binaryRNum1 = decimalToBinary(rnum1, 10);
+                  for (itmp = 0; itmp < 10; itmp++)
+                  {
+                     d_code[dindex][itmp2] = binaryRNum1[itmp];
+                  }
+
+                  /*decode the label case*/
+                  dindex++;
+
+                  int sindex = getSymbolIndex(label);
+                  int *num = decimalToBinary(symbols[sindex].address, 10);
+
+                  itmp = 0;
+                  itmp2 = 2;
+
+                  for (itmp = 0; itmp < 10; itmp++)
+                  {
+                     d_code[dindex][itmp2] = num[itmp];
+                  }
+               }
+            }
+            else
+            {
+               /*the sccond operand is a label*/
+
+               /*label case*/
+               d_code[dindex][2] = 1;
+               d_code[dindex][3] = 1;
+               d_code[dindex][4] = 0;
+
+               /*get label string*/
+               int itmp = i;
+               i = jumpToEndOfWord(i, newInput2);
+               i--;
+
+               /*check for comma*/
+               if (newInput2[i] == ',')
+               {
+                  i--;
+               }
+               int labelen = i - itmp;
+               char label[labelen];
+               int itmp2;
+               for (itmp2 = 0; itmp2 < labelen; itmp2++)
+               {
+                  label[itmp2] = newInput2[itmp];
+                  itmp++;
+               }
+
+               /*skip comma and get to the 3 operand*/
+               i = skipBlank(i, newInput2);
+               i++;
+               i = skipBlank(i, newInput2);
+
+               /*if the 3 opeand is a register*/
+               if (newInput2[i] == '@')
+               {
+
+                  /*opcode case*/
+                  int *binaryopcode = decimalToBinary(iopcode, 4);
+
+                  d_code[dindex][5] = binaryopcode[0];
+                  d_code[dindex][6] = binaryopcode[1];
+                  d_code[dindex][7] = binaryopcode[2];
+                  d_code[dindex][8] = binaryopcode[3];
+
+                  /*register case*/
+                  d_code[dindex][9] = 1;
+                  d_code[dindex][10] = 0;
+                  d_code[dindex][11] = 1;
+
+                  /*decode the label case*/
+                  dindex++;
+
+                  int sindex = getSymbolIndex(label);
+                  int *num = decimalToBinary(symbols[sindex].address, 10);
+
+                  itmp = 0;
+                  itmp2 = 2;
+
+                  for (itmp = 0; itmp < 10; itmp++)
+                  {
+                     d_code[dindex][itmp2] = num[itmp];
+                  }
+
+                  /*decode register case*/
+                  dindex++;
+                  /*get register num*/
+                  i += 2;
+                  int rnum = newInput2[i] - '0';
+                  int *binaryRNum = decimalToBinary(rnum, 4);
+
+                  d_code[dindex][2] = binaryRNum[0];
+                  d_code[dindex][3] = binaryRNum[1];
+                  d_code[dindex][4] = binaryRNum[2];
+                  d_code[dindex][5] = binaryRNum[3];
+                  d_code[dindex][6] = binaryRNum[4];
+
+                  d_code[dindex][7] = 0;
+                  d_code[dindex][8] = 0;
+                  d_code[dindex][9] = 0;
+                  d_code[dindex][10] = 0;
+                  d_code[dindex][11] = 0;
+               }
+            }
          }
       }
       // else
@@ -969,6 +1179,27 @@ int main()
       // }
       i = jumpToEndOfWord(i, newInput2);
    }
+
+   /*for testing*/
+   int y;
+   int x;
+
+   for (y = 0; y < 1000; y++)
+   {
+      for (x = 0; x < 12; x++)
+      {
+         if (d_code[y][x])
+         {
+            printf("%d",d_code[y][x]);
+         }
+         else
+         {
+            printf("%c", ' ');
+         }
+      }
+      printf("%c",' ');
+   }
+
 
    /*end new code here*************************************** */
 
