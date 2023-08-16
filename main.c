@@ -8,37 +8,39 @@
 #define FALSE 0;
 #define TRUE 1;
 
-int *decimalToBinary(int num, int size)
+int *decimalToBinary(int num, int array_size)
 {
-
-   static int *binaryArray;
-
-   binaryArray = (int *)malloc(size * sizeof(int));
-
-   // Initialize the array with zeros
-   for (int i = 0; i < size; i++)
+   int *arr = (int *)malloc(sizeof(int) * array_size);
+   if (!arr)
    {
-      binaryArray[i] = 0;
+      perror("Failed to allocate memory");
+      exit(1);
    }
 
-   // determine the binary suze
-   int binarySize = 0;
-   int numTmp = num;
-   while (numTmp > 0)
+   // Initialize the array to all zeros.
+   for (int i = 0; i < array_size; i++)
    {
-      numTmp = numTmp / 2;
-      binarySize++;
+      arr[i] = 0;
    }
 
-   // Convert the number to binary and store in the array
-   int index = binarySize - 1;
-   while (index >= 0)
+   // If the number is negative, calculate its 2's complement.
+   if (num < 0)
    {
-      binaryArray[index] = num % 2;
-      num = num / 2;
-      index--;
+      num = -num; // Take the absolute value.
+      num = ~num; // Invert the bits.
+      num += 1;   // Add 1.
    }
-   return binaryArray;
+
+   // Convert the number to binary and store it in the array.
+   int index = 0;
+   while (num && index < array_size)
+   {
+      arr[index] = num & 1;
+      num >>= 1;
+      index++;
+   }
+
+   return arr;
 }
 
 char *readFileToString(const char *filename)
@@ -419,224 +421,6 @@ int get_symbol_address(int itmp, char input[])
    return symbol_address;
 }
 
-int **opcode_case_to_binary(int iopcode, int i, char input[])
-{
-   /*decode array in decimal*/
-   static int d_code[4][4];
-   d_code[0][0] = 0;
-   int itmp = i;
-
-   itmp = jumpToEndOfWord(itmp, input);
-   itmp = skipBlank(itmp, input);
-
-   int opcode_group = get_opcode_group(iopcode);
-
-   /*start index input from sccond operand*/
-
-   if (opcode_group == 1)
-   {
-
-      /*to do: check sccond operand  & third operand if
-       label case or register case or number case!!!!!!!!!!!!!!!!!!!!!!!!*/
-
-      if (isDigit(input[itmp]))
-      {
-         int numlen = jumpToEndOfWord(i, input) - i;
-         int i2;
-         char cdigits[numlen];
-         for (i2 = 0; i2 < numlen; i2++)
-         {
-            cdigits[i2] = input[itmp];
-            itmp++;
-         }
-
-         itmp++;
-
-         int numoperand = toInt(cdigits);
-
-         itmp = skipBlank(itmp, input);
-         itmp++;
-         itmp = skipBlank(itmp, input);
-
-         if (input[itmp] == '@')
-         {
-            int registernum = input[itmp + 2] - '0';
-
-            /*case of opcode number,register*/
-
-            d_code[0][1] = 1;
-            d_code[0][2] = iopcode;
-            d_code[0][3] = 5;
-
-            d_code[1][0] = numoperand;
-            d_code[1][1] = 0;
-            d_code[1][2] = 0;
-
-            d_code[2][0] = registernum;
-            d_code[2][1] = 0;
-            d_code[2][2] = 0;
-         }
-         else
-         {
-
-            /*case of opcode number,label*/
-
-            d_code[0][1] = 1;
-            d_code[0][2] = iopcode;
-            d_code[0][3] = 3;
-
-            d_code[1][0] = numoperand;
-            d_code[1][1] = 0;
-            d_code[1][2] = 0;
-
-            d_code[2][0] = get_symbol_address(itmp, input);
-            d_code[2][1] = 0;
-            d_code[2][2] = 0;
-         }
-      }
-      else
-      {
-         if (is_r_to_r_case(itmp, input))
-         {
-
-            d_code[0][1] = 5;
-            d_code[0][2] = iopcode;
-            d_code[0][3] = 5;
-
-            d_code[1][0] = 0;
-            d_code[1][1] = 5;
-            d_code[1][2] = 5;
-            /*case -1 means ignore the last decoding*/
-            d_code[1][3] = -1;
-
-            int i2;
-            int j;
-            for (i2 = 2; i2 < 4; i2++)
-            {
-               for (j = 0; j < 4; j++)
-               {
-                  d_code[i2][j] = -1;
-               }
-            }
-
-            i2 = 0;
-            j = 0;
-         }
-      }
-   }
-
-   if (opcode_group == 2)
-   {
-
-      if (input[itmp] == '@')
-      {
-         d_code[0][1] = input[itmp + 2] - '0';
-         d_code[0][2] = iopcode;
-         d_code[0][3] = 0;
-      }
-      else
-      {
-         d_code[0][1] = get_symbol_address(itmp, input);
-         d_code[0][2] = iopcode;
-         d_code[0][3] = 0;
-      }
-
-      /*ignore the last operand*/
-      int j;
-
-      for (j = 0; j < 4; j++)
-      {
-         d_code[2][j] = -1;
-      }
-   }
-
-   if (opcode_group == 3)
-   {
-      d_code[0][1] = 0;
-      d_code[0][2] = iopcode;
-      d_code[0][3] = 0;
-
-      int j;
-
-      for (j = 0; j < 4; j++)
-      {
-         d_code[1][j] = -1;
-      }
-
-      for (j = 0; j < 4; j++)
-      {
-         d_code[2][j] = -1;
-      }
-   }
-
-   /*the last index of d_code is the index of the input itself*/
-   d_code[3][0] = itmp;
-   int x;
-   int y;
-   for (x = 0; x < 4; x++)
-   {
-      for (y = 0; y < 4; y++)
-      {
-         printf("%d", d_code[x][y]);
-      }
-   }
-
-   return d_code;
-}
-
-int *directive_cases_to_binary(int i, char input[])
-{
-   /*decode array in decimal*/
-   static int d_code[11];
-
-   if (isWordMatch(i, ".data", input))
-   {
-      i = jumpToEndOfWord(i, input);
-
-      int di = 0;
-
-      /*loop over the numbers until got to letter*/
-      while (isLetter(input[i]) == 0)
-      {
-         i = skipBlank(i, input);
-         if (input[i] == ',')
-         {
-            i++;
-            i = skipBlank(i, input);
-         }
-         int numlen = jumpToEndOfWord(i, input) - i;
-         char num[numlen];
-         int j;
-         for (j = 0; j < numlen; j++)
-         {
-            num[j] = input[i];
-            i++;
-         }
-
-         int number = toInt(num);
-
-         d_code[di] = number;
-         di++;
-      }
-
-      /*the last index of d_code is the index of the input itself*/
-      d_code[10] = i;
-
-      return d_code;
-   }
-
-   if (isWordMatch(i, ".string", input))
-   {
-      int strlength = jumpToEndOfWord(i, input) - i;
-      int j;
-      for (j = 0; j < strlength; j++)
-      {
-         d_code[j] = input[i];
-         i++;
-      }
-   }
-}
-
 int main()
 {
 
@@ -891,7 +675,7 @@ int main()
                i = skipBlank(i, newInput2);
 
                /* distinguish the decoding for the opcode operand in sibits 2 - 4
-               if the scond operand is a regiter or a label */
+               if the third operand is a regiter or a label */
                dindex--;
                if (newInput2[i] == '@')
                {
@@ -1001,22 +785,36 @@ int main()
                   /*dcoding the registers*/
                   dindex++;
                   d_code[dindex][0] = 0;
-                  d_code[dindex][1] = 1;
+                  d_code[dindex][1] = 0;
 
                   int *binaryRNum1 = decimalToBinary(rnum1, 5);
                   int *binaryRNum2 = decimalToBinary(rnum2, 5);
 
-                  d_code[dindex][2] = binaryRNum1[0];
-                  d_code[dindex][3] = binaryRNum1[1];
-                  d_code[dindex][4] = binaryRNum1[2];
-                  d_code[dindex][5] = binaryRNum1[3];
-                  d_code[dindex][6] = binaryRNum1[4];
+                  int itmp;
+                  int itmp2 = 0;
 
-                  d_code[dindex][7] = binaryRNum2[0];
-                  d_code[dindex][8] = binaryRNum2[1];
-                  d_code[dindex][9] = binaryRNum2[2];
-                  d_code[dindex][10] = binaryRNum2[3];
-                  d_code[dindex][11] = binaryRNum2[4];
+                  for (itmp = 2; itmp < 12; itmp++)
+                  {
+                     if (itmp2 == 5)
+                     {
+                        itmp2 = 0;
+                     }
+
+                     if (itmp < 7)
+                     {
+                        printf("%d", itmp2);
+                        /*decode destination register operand*/
+                        d_code[dindex][itmp] = binaryRNum2[itmp2];
+                     }
+                     else
+                     {
+                        printf("%d", itmp2);
+                        /*dcode source register o0erand*/
+                        d_code[dindex][itmp] = binaryRNum1[itmp2];
+                     }
+
+                     itmp2++;
+                  }
                }
                else
                {
@@ -1036,11 +834,13 @@ int main()
                   }
 
                   /*decode register to label case*/
+                  d_code[dindex][0] = 0;
+                  d_code[dindex][1] = 0;
 
                   /*register case*/
-                  d_code[dindex][2] = 1;
-                  d_code[dindex][3] = 0;
-                  d_code[dindex][4] = 1;
+                  d_code[dindex][9] = 1;
+                  d_code[dindex][10] = 0;
+                  d_code[dindex][11] = 1;
 
                   /*opcode case*/
                   int *binaryopcode = decimalToBinary(iopcode, 4);
@@ -1051,43 +851,52 @@ int main()
                   d_code[dindex][8] = binaryopcode[3];
 
                   /*label case*/
-                  d_code[dindex][9] = 1;
-                  d_code[dindex][10] = 1;
-                  d_code[dindex][11] = 0;
+                  d_code[dindex][2] = 1;
+                  d_code[dindex][3] = 1;
+                  d_code[dindex][4] = 0;
 
                   /*decode the register operand*/
                   dindex++;
-                  itmp2 = 2;
-                  int *binaryRNum1 = decimalToBinary(rnum1, 10);
-                  for (itmp = 0; itmp < 10; itmp++)
+                  itmp2 = 0;
+                  int *binaryRNum1 = decimalToBinary(rnum1, 5);
+                  for (itmp = 0; itmp < 12; itmp++)
                   {
-                     d_code[dindex][itmp2] = binaryRNum1[itmp];
+                     if (itmp > 6 && itmp < 12)
+                     {
+                        d_code[dindex][itmp] = binaryRNum1[itmp2];
+                        itmp2++;
+                     }
+                     else
+                     {
+                        d_code[dindex][itmp] = 0;
+                     }
                   }
 
-                  /*decode the label case*/
+                  /*decode the label operand*/
                   dindex++;
 
                   int sindex = getSymbolIndex(label);
-                  int *num = decimalToBinary(symbols[sindex].address, 10);
+                  int *num = decimalToBinary(symbols[sindex].address, 12);
+                  printf("%d", num[130]);
 
                   itmp = 0;
-                  itmp2 = 2;
+                  itmp2 = 0;
 
-                  for (itmp = 0; itmp < 10; itmp++)
+                  for (itmp = 0; itmp < 12; itmp++)
                   {
-                     d_code[dindex][itmp2] = num[itmp];
+                        d_code[dindex][itmp] = num[itmp];         
                   }
                }
             }
             else
             {
                /*the sccond operand is a label*/
-               printf("%s", "got to label case");
+               printf("%s", "got to label to registar case");
 
                /*label case*/
-               d_code[dindex][2] = 1;
-               d_code[dindex][3] = 1;
-               d_code[dindex][4] = 0;
+               d_code[dindex][9] = 1;
+               d_code[dindex][10] = 1;
+               d_code[dindex][11] = 0;
 
                /*get label string*/
                int itmp = i;
@@ -1126,9 +935,9 @@ int main()
                   d_code[dindex][8] = binaryopcode[3];
 
                   /*register case*/
-                  d_code[dindex][9] = 1;
-                  d_code[dindex][10] = 0;
-                  d_code[dindex][11] = 1;
+                  d_code[dindex][2] = 1;
+                  d_code[dindex][3] = 0;
+                  d_code[dindex][4] = 1;
 
                   /*decode the label case*/
                   dindex++;
@@ -1165,17 +974,13 @@ int main()
                }
             }
          }
+         dindex++;
       }
       // else
       // {
       //    if (isDirective(i, newInput2))
       //    {
-      //       int *d_code = directive_cases_to_binary(i, newInput2);
-      //       int x;
-      //       for (x = 0; x < sizeof(d_code); x++)
-      //       {
-      //          printf("%d", d_code[x]);
-      //       }
+
       //    }
       //    else
       //    {
