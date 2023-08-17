@@ -277,10 +277,9 @@ struct Mcro createMcro(int i, char input[])
    return m;
 }
 
-int isDirective(int i, char input[])
+int isData(int i, char input[])
 {
-   if (isWordMatch(i, ".data", input) || isWordMatch(i, ".string", input) ||
-       isWordMatch(i, ".entry", input) || isWordMatch(i, ".extern", input))
+   if (isWordMatch(i, ".data", input))
    {
       return TRUE;
    }
@@ -290,7 +289,30 @@ int isDirective(int i, char input[])
    }
 }
 
-/*to do: translate to binary code*/
+int isString(int i, char input[])
+{
+   if (isWordMatch(i, ".string", input))
+   {
+      return TRUE;
+   }
+   else
+   {
+      return FALSE;
+   }
+}
+
+int isExternOrEntry(int i, char input[])
+{
+   if (isWordMatch(i, ".entry", input) || isWordMatch(i, ".extern", input))
+   {
+      return TRUE;
+   }
+   else
+   {
+      return FALSE;
+   }
+}
+
 
 int isDigit(char c)
 {
@@ -877,14 +899,13 @@ int main()
 
                   int sindex = getSymbolIndex(label);
                   int *num = decimalToBinary(symbols[sindex].address, 12);
-                  printf("%d", num[130]);
 
                   itmp = 0;
                   itmp2 = 0;
 
                   for (itmp = 0; itmp < 12; itmp++)
                   {
-                        d_code[dindex][itmp] = num[itmp];         
+                     d_code[dindex][itmp] = num[itmp];
                   }
                }
             }
@@ -974,19 +995,131 @@ int main()
                }
             }
          }
+
+         if (opcode_group == 2)
+         {
+            d_code[dindex][0] = 0;
+            d_code[dindex][1] = 0;
+
+            int *binaryOpcode = decimalToBinary(iopcode, 4);
+
+            d_code[dindex][5] = binaryOpcode[0];
+            d_code[dindex][6] = binaryOpcode[1];
+            d_code[dindex][7] = binaryOpcode[2];
+            d_code[dindex][8] = binaryOpcode[3];
+
+            d_code[dindex][9] = 0;
+            d_code[dindex][10] = 0;
+            d_code[dindex][11] = 0;
+
+            /*decode register case*/
+            if (newInput2[i] == '@')
+            {
+
+               d_code[dindex][2] = 1;
+               d_code[dindex][3] = 0;
+               d_code[dindex][4] = 1;
+
+               /*decode the register*/
+               dindex++;
+
+               i += 2;
+               int rnum = newInput2[i] - '0';
+               /*get after register*/
+               i++;
+
+               int *binaryRnum = decimalToBinary(rnum, 5);
+               int itmp = 0;
+               int itmp2 = 0;
+
+               for (itmp = 0; itmp < 12; itmp++)
+               {
+                  if (itmp > 1 && itmp < 7)
+                  {
+                     d_code[dindex][itmp] = binaryRnum[itmp2];
+                     itmp2++;
+                  }
+                  else
+                  {
+                     d_code[dindex][itmp] = 0;
+                  }
+               }
+            }
+            else
+            {
+               /*decode label case*/
+               d_code[dindex][2] = 1;
+               d_code[dindex][3] = 1;
+               d_code[dindex][4] = 0;
+
+               /*dcode the label*/
+               dindex++;
+
+               /*get label string*/
+               int itmp = i;
+               i = jumpToEndOfWord(i, newInput2);
+               int labelen = i - itmp;
+               char label[labelen];
+               int itmp2;
+               for (itmp2 = 0; itmp2 < labelen; itmp2++)
+               {
+                  label[itmp2] = newInput2[itmp];
+                  itmp++;
+               }
+
+               int sindex = getSymbolIndex(label);
+               int *num = decimalToBinary(symbols[sindex].address, 12);
+
+               itmp = 0;
+               itmp2 = 0;
+
+               for (itmp = 0; itmp < 12; itmp++)
+               {
+                  d_code[dindex][itmp] = num[itmp];
+               }
+            }
+         }
+
+         if (opcode_group == 3)
+         {
+            d_code[dindex][0] = 0;
+            d_code[dindex][1] = 0;
+
+            d_code[dindex][2] = 0;
+            d_code[dindex][3] = 0;
+            d_code[dindex][4] = 0;
+
+            int *binaryOpcode = decimalToBinary(iopcode, 4);
+
+            d_code[dindex][5] = binaryOpcode[0];
+            d_code[dindex][6] = binaryOpcode[1];
+            d_code[dindex][7] = binaryOpcode[2];
+            d_code[dindex][8] = binaryOpcode[3];
+
+            d_code[dindex][9] = 0;
+            d_code[dindex][10] = 0;
+            d_code[dindex][11] = 0;
+         }
          dindex++;
       }
-      // else
-      // {
-      //    if (isDirective(i, newInput2))
-      //    {
+      else
+      {
+         if (isData(i, newInput2))
+         {
+            
+         }
 
-      //    }
-      //    else
-      //    {
-      //       i = jumpToEndOfWord(i, newInput2);
-      //    }
-      // }
+         if(isString(i,newInput2))
+         {
+
+         }
+
+         if(isExternOrEntry(i,newInput2))
+         {
+            
+         }
+
+      }
       i = jumpToEndOfWord(i, newInput2);
    }
 
