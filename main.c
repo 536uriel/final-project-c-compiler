@@ -823,13 +823,11 @@ int main()
 
                      if (itmp < 7)
                      {
-                        printf("%d", itmp2);
                         /*decode destination register operand*/
                         d_code[dindex][itmp] = binaryRNum2[itmp2];
                      }
                      else
                      {
-                        printf("%d", itmp2);
                         /*dcode source register o0erand*/
                         d_code[dindex][itmp] = binaryRNum1[itmp2];
                      }
@@ -1102,12 +1100,61 @@ int main()
          dindex++;
       }
 
-      // if (isData(i, newInput2))
-      // {
-      // }
+      if (isData(i, newInput2))
+      {
+         printf("%s", "got to .data");
+
+         /*skip .data word */
+         i = jumpToEndOfWord(i, newInput2);
+         i = skipBlank(i, newInput2);
+
+         /*get all integers*/
+         int bol = TRUE;
+
+         char strnum[10];
+         int itmp = 0;
+         int itmp2 = 0;
+         while (bol)
+         {
+
+            while (isDigit(newInput2[i]))
+            {
+               strnum[itmp] = newInput2[i];
+               itmp++;
+               i++;
+            }
+
+            int n = toInt(strnum);
+            int *num = decimalToBinary(n, 12);
+
+            itmp = 0;
+            itmp2 = 0;
+
+            for (itmp = 0; itmp < 12; itmp++)
+            {
+               d_code[dindex][itmp2] = num[itmp];
+            }
+
+            i = skipBlank(i, newInput2);
+            if (newInput2[i] == ',' && !isLetter(newInput2[i]))
+            {
+               i++;
+               i = skipBlank(i, newInput2);
+               dindex++;
+            }
+            else
+            {
+               bol = FALSE;
+            }
+         }
+         dindex++;
+      }
+
+      printf("%c", ' ');
 
       if (isString(i, newInput2))
       {
+         printf("%s", "got to .string");
          /*skip .string*/
          i = jumpToEndOfWord(i, newInput2);
          i = skipBlank(i, newInput2);
@@ -1152,9 +1199,16 @@ int main()
          dindex++;
       }
 
-      // if (isExternOrEntry(i, newInput2))
-      // {
-      // }
+      printf("%c", ' ');
+
+      if (isExternOrEntry(i, newInput2))
+      {
+         i = jumpToEndOfWord(i, newInput2);
+         i = skipBlank(i, newInput2);
+
+         i = jumpToEndOfWord(i, newInput2);
+         i = skipBlank(i, newInput2);
+      }
 
       i = jumpToEndOfWord(i, newInput2);
    }
