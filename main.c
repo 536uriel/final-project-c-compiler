@@ -313,7 +313,6 @@ int isExternOrEntry(int i, char input[])
    }
 }
 
-
 int isDigit(char c)
 {
    if (c > '0' && c < '9')
@@ -1102,24 +1101,61 @@ int main()
          }
          dindex++;
       }
-      else
+
+      // if (isData(i, newInput2))
+      // {
+      // }
+
+      if (isString(i, newInput2))
       {
-         if (isData(i, newInput2))
+         /*skip .string*/
+         i = jumpToEndOfWord(i, newInput2);
+         i = skipBlank(i, newInput2);
+         /*skip "*/
+         i++;
+
+         /*get string length*/
+         int len = jumpToEndOfWord(i, newInput2) - 1 - i;
+
+         char str[len];
+         int itmp = 0;
+         int itmp2 = 0;
+
+         /*put string into str*/
+         for (itmp = 0; itmp < len; itmp++)
          {
-            
+            str[itmp] = i;
+            i++;
          }
 
-         if(isString(i,newInput2))
-         {
+         /* get after string to blank*/
+         i += 2;
 
+         /*decode string*/
+         for (itmp = 0; itmp < len; itmp++)
+         {
+            int *ascii = decimalToBinary(str[itmp], 12);
+
+            for (itmp2 = 0; itmp2 < 12; itmp2++)
+            {
+               d_code[dindex][itmp2] = ascii[itmp2];
+            }
+
+            dindex++;
          }
 
-         if(isExternOrEntry(i,newInput2))
+         for (itmp2 = 0; itmp2 < 12; itmp2++)
          {
-            
+            d_code[dindex][itmp2] = 0;
          }
 
+         dindex++;
       }
+
+      // if (isExternOrEntry(i, newInput2))
+      // {
+      // }
+
       i = jumpToEndOfWord(i, newInput2);
    }
 
