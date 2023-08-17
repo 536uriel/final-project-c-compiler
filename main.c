@@ -8,6 +8,43 @@
 #define FALSE 0;
 #define TRUE 1;
 
+// Base64 character set
+char base64_chars[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+
+char getBase64Char(int val)
+{
+   if (val >= 0 && val < 64)
+   {
+      return base64_chars[val];
+   }
+   return ' '; // Error condition, you can handle it as you like.
+}
+
+char *convertArrayToBase64(int arr[12])
+{
+   int first6 = 0, next6 = 0;
+
+   // Convert the first 6 cells into a single integer
+   for (int i = 0; i < 6; i++)
+   {
+      first6 = (first6 << 1) | (arr[i] & 0x01);
+   }
+
+   // Convert the next 6 cells into a single integer
+   for (int i = 6; i < 12; i++)
+   {
+      next6 = (next6 << 1) | (arr[i] & 0x01);
+   }
+
+   // Convert the two integers into Base64 characters
+   static char result[3];
+   result[0] = getBase64Char(first6);
+   result[1] = getBase64Char(next6);
+   result[2] = '\0';
+
+   return result;
+}
+
 int *decimalToBinary(int num, int array_size)
 {
    int *arr = (int *)malloc(sizeof(int) * array_size);
@@ -1213,7 +1250,7 @@ int main()
       i = jumpToEndOfWord(i, newInput2);
    }
 
-   /*for testing*/
+   /* convert d_code binary array ro base64 letters:*/
    int y;
    int x;
 
@@ -1221,10 +1258,61 @@ int main()
    {
       for (x = 0; x < 12; x++)
       {
+         /*for testing*/
          printf("%d", d_code[y][x]);
       }
       printf("%c", ' ');
    }
+
+   char decodingResultStr[dindex][2];
+
+   for (y = 0; y < dindex; y++)
+   {
+      char *strTmp = convertArrayToBase64(d_code[y]);
+
+      decodingResultStr[y][0] = strTmp[0];
+      decodingResultStr[y][1] = strTmp[1];
+
+      /*for testing*/
+      printf("%s", decodingResultStr[y]);
+      printf("%c", ' ');
+   }
+
+   int slen = dindex * 3;
+   char outputStr[slen];
+   int indexTmp = 0;
+
+   for (y = 0; y < dindex; y++)
+   {
+      outputStr[indexTmp] = decodingResultStr[y][0];
+      indexTmp++;
+      outputStr[indexTmp] = decodingResultStr[y][1];
+      indexTmp++;
+      outputStr[indexTmp] = ' ';
+      indexTmp++;
+   }
+
+   // Pointer to the file
+   FILE *file;
+
+   // Open a file in write mode. If the file doesn't exist, it will be created.
+   // If it exists, its contents will be overwritten.
+   file = fopen("ps.ob", "w");
+
+   // Check if the file was opened successfully
+   if (file == NULL)
+   {
+      printf("Error opening the file!\n");
+      return 1; // Return an error code
+   }
+
+   // Write some text to the file
+   fprintf(file, outputStr);
+
+   // Close the file
+   fclose(file);
+
+   printf("Data written to example.txt\n");
 
    /*end new code here*************************************** */
 
