@@ -352,7 +352,7 @@ int isExternOrEntry(int i, char input[])
 
 int isDigit(char c)
 {
-   if (c > '0' && c < '9')
+   if (c >= '0' && c <= '9' || c == '-')
    {
       return TRUE;
    }
@@ -365,9 +365,19 @@ int isDigit(char c)
 int toInt(char digits[])
 {
 
+   int bol = 1;
+   int skipIndex = 0;
+
+   if(digits[0] == '-')
+   {
+      bol = -1;
+      skipIndex = 1;
+
+   }
+
    int num = 0;
    int index;
-   for (index = 0; index < sizeof(digits); index++)
+   for (index = skipIndex; index < strlen(digits); index++)
    {
       int digit = digits[index] - '0';
       if (num == 0)
@@ -379,7 +389,10 @@ int toInt(char digits[])
          num *= 10;
          num += digit;
       }
+
    }
+
+   num *= bol;
 
    return num;
 }
@@ -1081,6 +1094,8 @@ int main()
             }
             else
             {
+               /*to do: add here number case & minos case in general*/
+               
                /*decode label case*/
                d_code[dindex][2] = 1;
                d_code[dindex][3] = 1;
@@ -1313,6 +1328,7 @@ int main()
    fclose(file);
 
    printf("Data written to example.txt\n");
+
 
    /*end new code here*************************************** */
 
