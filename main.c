@@ -368,11 +368,10 @@ int toInt(char digits[])
    int bol = 1;
    int skipIndex = 0;
 
-   if(digits[0] == '-')
+   if (digits[0] == '-')
    {
       bol = -1;
       skipIndex = 1;
-
    }
 
    int num = 0;
@@ -389,7 +388,6 @@ int toInt(char digits[])
          num *= 10;
          num += digit;
       }
-
    }
 
    num *= bol;
@@ -665,8 +663,6 @@ int main()
    // /* int *arr= test();
    // printf("%d",arr[0]); */
 
-   // /* to do: ignore after .extermn/entry label operands******************** */
-
    // /*new code here****************************************** */
 
    // /*convert newinput to binary*/
@@ -689,6 +685,15 @@ int main()
 
          d_code[dindex][0] = 0;
          d_code[dindex][1] = 0;
+
+         /*opcode case*/
+         int *binaryopcode = decimalToBinary(iopcode, 4);
+
+         d_code[dindex][5] = binaryopcode[0];
+         d_code[dindex][6] = binaryopcode[1];
+         d_code[dindex][7] = binaryopcode[2];
+         d_code[dindex][8] = binaryopcode[3];
+
          /*skip opcode word*/
          i = jumpToEndOfWord(i, newInput2);
          i = skipBlank(i, newInput2);
@@ -721,7 +726,7 @@ int main()
                dindex++;
 
                char strnum[10];
-               itmp2 = 0;
+               itmp = 0;
                while (isDigit(newInput2[i]))
                {
                   strnum[itmp] = newInput2[i];
@@ -840,14 +845,6 @@ int main()
                   d_code[dindex][3] = 0;
                   d_code[dindex][4] = 1;
 
-                  /*opcode case*/
-                  int *binaryopcode = decimalToBinary(iopcode, 4);
-
-                  d_code[dindex][5] = binaryopcode[0];
-                  d_code[dindex][6] = binaryopcode[1];
-                  d_code[dindex][7] = binaryopcode[2];
-                  d_code[dindex][8] = binaryopcode[3];
-
                   /*register case*/
                   d_code[dindex][9] = 1;
                   d_code[dindex][10] = 0;
@@ -911,14 +908,6 @@ int main()
                   d_code[dindex][10] = 0;
                   d_code[dindex][11] = 1;
 
-                  /*opcode case*/
-                  int *binaryopcode = decimalToBinary(iopcode, 4);
-
-                  d_code[dindex][5] = binaryopcode[0];
-                  d_code[dindex][6] = binaryopcode[1];
-                  d_code[dindex][7] = binaryopcode[2];
-                  d_code[dindex][8] = binaryopcode[3];
-
                   /*label case*/
                   d_code[dindex][2] = 1;
                   d_code[dindex][3] = 1;
@@ -944,13 +933,16 @@ int main()
                   /*decode the label operand*/
                   dindex++;
 
+                  d_code[dindex][0] = 0;
+                  d_code[dindex][1] = 1;
+
                   int sindex = getSymbolIndex(label);
-                  int *num = decimalToBinary(symbols[sindex].address, 12);
+                  int *num = decimalToBinary(symbols[sindex].address, 10);
 
                   itmp = 0;
                   itmp2 = 0;
 
-                  for (itmp = 0; itmp < 12; itmp++)
+                  for (itmp = 2; itmp < 12; itmp++)
                   {
                      d_code[dindex][itmp] = num[itmp];
                   }
@@ -994,14 +986,6 @@ int main()
                if (newInput2[i] == '@')
                {
 
-                  /*opcode case*/
-                  int *binaryopcode = decimalToBinary(iopcode, 4);
-
-                  d_code[dindex][5] = binaryopcode[0];
-                  d_code[dindex][6] = binaryopcode[1];
-                  d_code[dindex][7] = binaryopcode[2];
-                  d_code[dindex][8] = binaryopcode[3];
-
                   /*register case*/
                   d_code[dindex][2] = 1;
                   d_code[dindex][3] = 0;
@@ -1009,6 +993,9 @@ int main()
 
                   /*decode the label case*/
                   dindex++;
+
+                  d_code[dindex][0] = 0;
+                  d_code[dindex][1] = 1;
 
                   int sindex = getSymbolIndex(label);
                   int *num = decimalToBinary(symbols[sindex].address, 10);
@@ -1047,13 +1034,6 @@ int main()
          {
             d_code[dindex][0] = 0;
             d_code[dindex][1] = 0;
-
-            int *binaryOpcode = decimalToBinary(iopcode, 4);
-
-            d_code[dindex][5] = binaryOpcode[0];
-            d_code[dindex][6] = binaryOpcode[1];
-            d_code[dindex][7] = binaryOpcode[2];
-            d_code[dindex][8] = binaryOpcode[3];
 
             d_code[dindex][9] = 0;
             d_code[dindex][10] = 0;
@@ -1094,37 +1074,84 @@ int main()
             }
             else
             {
-               /*to do: add here number case & minos case in general*/
-               
-               /*decode label case*/
-               d_code[dindex][2] = 1;
-               d_code[dindex][3] = 1;
-               d_code[dindex][4] = 0;
 
-               /*dcode the label*/
-               dindex++;
-
-               /*get label string*/
-               int itmp = i;
-               i = jumpToEndOfWord(i, newInput2);
-               int labelen = i - itmp;
-               char label[labelen];
-               int itmp2;
-               for (itmp2 = 0; itmp2 < labelen; itmp2++)
+               if (isDigit(newInput2[i]))
                {
-                  label[itmp2] = newInput2[itmp];
-                  itmp++;
+
+                  /* number case*/
+
+                  d_code[dindex][2] = 1;
+                  d_code[dindex][3] = 0;
+                  d_code[dindex][4] = 0;
+
+                  /*decode the number*/
+                  dindex++;
+
+                  d_code[dindex][0] = 0;
+                  d_code[dindex][1] = 0;
+
+                  char strnum[10];
+                  int itmp = 0;
+                  while (isDigit(newInput2[i]))
+                  {
+                     strnum[itmp] = newInput2[i];
+                     itmp++;
+                     i++;
+                  }
+
+                  int num = toInt(strnum);
+
+                  int *binaryNum = decimalToBinary(num, 10);
+
+                  itmp = 2;
+                  int itmp2 = 0;
+
+                  for (itmp = 2; itmp < 12; itmp++)
+                  {
+                     d_code[dindex][itmp] = binaryNum[itmp2];
+                     itmp2++;
+                  }
                }
-
-               int sindex = getSymbolIndex(label);
-               int *num = decimalToBinary(symbols[sindex].address, 12);
-
-               itmp = 0;
-               itmp2 = 0;
-
-               for (itmp = 0; itmp < 12; itmp++)
+               else
                {
-                  d_code[dindex][itmp] = num[itmp];
+                  /*decode label case*/
+                  d_code[dindex][2] = 1;
+                  d_code[dindex][3] = 1;
+                  d_code[dindex][4] = 0;
+
+                  /*dcode the label*/
+                  dindex++;
+
+                  d_code[dindex][0] = 0;
+                  d_code[dindex][1] = 1;
+
+                  /*get label string*/
+                  int itmp = i;
+                  i = jumpToEndOfWord(i, newInput2);
+                  int labelen = i - itmp;
+
+                  labelen++;
+
+                  char label[labelen];
+                  int itmp2;
+                  for (itmp2 = 0; itmp2 < labelen - 1; itmp2++)
+                  {
+                     label[itmp2] = newInput2[itmp];
+                     itmp++;
+                  }
+
+                  label[labelen - 1] = '\0';
+
+                  int sindex = getSymbolIndex(label);
+                  int *num = decimalToBinary(symbols[sindex].address, 10);
+
+                  itmp = 2;
+                  itmp2 = 0;
+
+                  for (itmp = 2; itmp < 12; itmp++)
+                  {
+                     d_code[dindex][itmp] = num[itmp];
+                  }
                }
             }
          }
@@ -1327,8 +1354,7 @@ int main()
    // Close the file
    fclose(file);
 
-   printf("Data written to example.txt\n");
-
+   printf("Data written to ps.ob\n");
 
    /*end new code here*************************************** */
 
