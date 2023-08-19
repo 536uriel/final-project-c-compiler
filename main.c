@@ -3,7 +3,6 @@
 #include <string.h>
 #include <unistd.h>
 #include "limits.h";
-#include "to-binary.c"
 
 #define FALSE 0;
 #define TRUE 1;
