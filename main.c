@@ -1204,6 +1204,7 @@ int main()
             }
 
             int n = toInt(strnum);
+            printf("%d",n);
             int *num = decimalToBinary(n, 12);
 
             itmp = 0;
@@ -1215,7 +1216,7 @@ int main()
             }
 
             i = skipBlank(i, newInput2);
-            if (newInput2[i] == ',' && !isLetter(newInput2[i]))
+            if (newInput2[i] == ',')
             {
                i++;
                i = skipBlank(i, newInput2);
@@ -1238,21 +1239,23 @@ int main()
          i = jumpToEndOfWord(i, newInput2);
          i = skipBlank(i, newInput2);
          /*skip "*/
-         i++;
+         i += 3;
 
          /*get string length*/
-         int len = jumpToEndOfWord(i, newInput2) - 1 - i;
+         int len = jumpToEndOfWord(i, newInput2) - 2 - i;
 
          char str[len];
          int itmp = 0;
          int itmp2 = 0;
 
          /*put string into str*/
-         for (itmp = 0; itmp < len; itmp++)
+         for (itmp = 0; itmp < len - 1; itmp++)
          {
-            str[itmp] = i;
+            str[itmp] = newInput2[i];
             i++;
          }
+
+         str[len - 1] = '\0';
 
          /* get after string to blank*/
          i += 2;
