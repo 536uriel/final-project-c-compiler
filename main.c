@@ -180,6 +180,16 @@ int skipBlank(int i, char input[])
       i++;
    }
 
+   if (input[i] == '\n')
+   {
+      i++;
+   }
+
+   while (input[i] == ' ')
+   {
+      i++;
+   }
+
    return i;
 }
 
@@ -871,12 +881,13 @@ int main()
                   int sindex = getSymbolIndex(label);
                   int *num = decimalToBinary(symbols[sindex].address, 10);
 
-                  itmp = 0;
-                  itmp2 = 2;
+                  itmp = 2;
+                  itmp2 = 0;
 
-                  for (itmp = 0; itmp < 10; itmp++)
+                  for (itmp = 2; itmp < 12; itmp++)
                   {
-                     d_code[dindex][itmp2] = num[itmp];
+                     d_code[dindex][itmp] = num[itmp2];
+                     itmp2++;
                   }
                }
             }
