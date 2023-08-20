@@ -1354,13 +1354,6 @@ int main()
 
             dindex++;
          }
-
-         for (itmp2 = 0; itmp2 < 12; itmp2++)
-         {
-            d_code[dindex][itmp2] = 0;
-         }
-
-         dindex++;
       }
 
       printf("%c", ' ');
