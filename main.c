@@ -492,127 +492,12 @@ int get_symbol_address(int itmp, char input[])
 int main()
 {
 
+   printf("%s", "start debug: ");
+
    char *inputText = readFileToString("input.txt");
    /*input index*/
    int i = 0;
-   /*memory index*/
-   int mi = 100;
-   printf("%s", "start debug: ");
 
-   while (i < strlen(inputText))
-   {
-      printf("%c", ' ');
-
-      int wasDataCase = FALSE;
-
-      i = skipBlank(i, inputText);
-
-      if (isSymbol(i, inputText))
-      {
-
-         int cnt = i;
-         while (inputText[cnt] != ' ')
-         {
-            cnt++;
-         }
-
-         int j;
-         /*cnt - i => the length of the symbol word*/
-         for (j = 0; j < cnt - i - 1; j++)
-         {
-            symbols[indexSymbols].name[j] = inputText[i + j];
-         }
-
-         symbols[indexSymbols].address = mi;
-         indexSymbols++;
-      }
-      else
-      {
-         if (isString(i, inputText))
-         {
-            /*get to string word*/
-            i = jumpToEndOfWord(i, inputText);
-            i = skipBlank(i, inputText);
-            /*skip "*/
-            i += 3;
-
-            /*get string length*/
-            int len = jumpToEndOfWord(i, inputText) - 2 - i;
-
-            /*count the memory for the string*/
-            mi += len;
-         }
-         else
-         {
-            printf("%c", ' ');
-
-            if (isData(i, inputText))
-            {
-
-               /*skip .data word */
-               i = jumpToEndOfWord(i, inputText);
-               i = skipBlank(i, inputText);
-
-               /*get all integers*/
-               int bol = TRUE;
-
-               while (bol)
-               {
-                  /*to fix*/
-                  if (isDigit(inputText[i]))
-                  {
-                     /*count the memory for the numbers*/
-                     mi++;
-                  }
-                  while (isDigit(inputText[i]))
-                  {
-                     i++;
-                  }
-
-                  i = skipBlank(i, inputText);
-                  if (inputText[i] == ',')
-                  {
-                     i++;
-                     i = skipBlank(i, inputText);
-                  }
-                  else
-                  {
-                     bol = FALSE;
-                     wasDataCase = TRUE;
-                  }
-               }
-            }
-            else
-            {
-               if (!is_r_to_r_case(i, inputText))
-               {
-                  mi++;
-               }
-            }
-         }
-      }
-
-      if (!wasDataCase)
-      {
-         i = jumpToEndOfWord(i, inputText);
-      }
-      wasDataCase = FALSE;
-   }
-
-   i = 0;
-   mi = 0;
-
-   /*for testing*/
-   int j;
-   for (j = 0; j < (sizeof(symbols) / sizeof(symbols[0])); j++)
-   {
-      printf("%s", (symbols[j].name));
-      printf("%d", symbols[j].address);
-      printf("%s", "/");
-   }
-   indexSymbols = 0;
-
-   /* until here its first level of the compliler */
    // /*create macros*/
    while (i < strlen(inputText))
    {
@@ -723,20 +608,134 @@ int main()
 
    i = 0;
 
+   /*create symbols*/
+
+   /*memory index*/
+   int mi = 100;
+
+   while (i < strlen(newInput2))
+   {
+      printf("%c", ' ');
+
+      int wasDataCase = FALSE;
+
+      i = skipBlank(i, newInput2);
+
+      if (isSymbol(i, newInput2))
+      {
+
+         int cnt = i;
+         while (newInput2[cnt] != ' ')
+         {
+            cnt++;
+         }
+
+         int j;
+         /*cnt - i => the length of the symbol word*/
+         for (j = 0; j < cnt - i - 1; j++)
+         {
+            symbols[indexSymbols].name[j] = newInput2[i + j];
+         }
+
+         symbols[indexSymbols].address = mi;
+         indexSymbols++;
+      }
+      else
+      {
+         if (isString(i, newInput2))
+         {
+            /*get to string word*/
+            i = jumpToEndOfWord(i, newInput2);
+            i = skipBlank(i, newInput2);
+            /*skip "*/
+            i += 3;
+
+            /*get string length*/
+            int len = jumpToEndOfWord(i, newInput2) - 2 - i;
+
+            /*count the memory for the string*/
+            mi += len;
+         }
+         else
+         {
+            printf("%c", ' ');
+
+            if (isData(i, newInput2))
+            {
+
+               /*skip .data word */
+               i = jumpToEndOfWord(i, newInput2);
+               i = skipBlank(i, newInput2);
+
+               /*get all integers*/
+               int bol = TRUE;
+
+               while (bol)
+               {
+                  /*to fix*/
+                  if (isDigit(newInput2[i]))
+                  {
+                     /*count the memory for the numbers*/
+                     mi++;
+                  }
+                  while (isDigit(newInput2[i]))
+                  {
+                     i++;
+                  }
+
+                  i = skipBlank(i, newInput2);
+                  if (inputText[i] == ',')
+                  {
+                     i++;
+                     i = skipBlank(i, newInput2);
+                  }
+                  else
+                  {
+                     bol = FALSE;
+                     wasDataCase = TRUE;
+                  }
+               }
+            }
+            else
+            {
+               if (!is_r_to_r_case(i, newInput2))
+               {
+                  mi++;
+               }
+            }
+         }
+      }
+
+      if (!wasDataCase)
+      {
+         i = jumpToEndOfWord(i, newInput2);
+      }
+      wasDataCase = FALSE;
+   }
+
+   i = 0;
+   mi = 0;
+
+   /*for testing*/
+   int j;
+   for (j = 0; j < (sizeof(symbols) / sizeof(symbols[0])); j++)
+   {
+      printf("%s", (symbols[j].name));
+      printf("%d", symbols[j].address);
+      printf("%s", "/");
+   }
+   indexSymbols = 0;
+
+   /* until here its first level of the compliler */
+
    // /*until here summery:
    // we created array of symbol with there names and addresses
    // and we created macros  instances and replaced the instance
    // with the insider code*/
 
-   // /*test the array returned from function */
-   // /* int *arr= test();
-   // printf("%d",arr[0]); */
-
    // /*new code here****************************************** */
 
    // /*convert newinput to binary*/
-
-   /* to fix */
 
    i = 0;
 
@@ -1008,12 +1007,13 @@ int main()
                   int sindex = getSymbolIndex(label);
                   int *num = decimalToBinary(symbols[sindex].address, 10);
 
-                  itmp = 0;
+                  itmp = 2;
                   itmp2 = 0;
 
                   for (itmp = 2; itmp < 12; itmp++)
                   {
-                     d_code[dindex][itmp] = num[itmp];
+                     d_code[dindex][itmp] = num[itmp2];
+                     itmp2++;
                   }
                }
             }
@@ -1069,12 +1069,13 @@ int main()
                   int sindex = getSymbolIndex(label);
                   int *num = decimalToBinary(symbols[sindex].address, 10);
 
-                  itmp = 0;
-                  itmp2 = 2;
+                  itmp = 2;
+                  itmp2 = 0;
 
-                  for (itmp = 0; itmp < 10; itmp++)
+                  for (itmp = 2; itmp < 12; itmp++)
                   {
-                     d_code[dindex][itmp2] = num[itmp];
+                     d_code[dindex][itmp] = num[itmp2];
+                     itmp2++;
                   }
 
                   /*decode register case*/
@@ -1219,7 +1220,8 @@ int main()
 
                   for (itmp = 2; itmp < 12; itmp++)
                   {
-                     d_code[dindex][itmp] = num[itmp];
+                     d_code[dindex][itmp] = num[itmp2];
+                     itmp2++;
                   }
                }
             }
