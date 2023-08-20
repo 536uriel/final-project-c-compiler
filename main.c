@@ -496,11 +496,14 @@ int main()
    /*input index*/
    int i = 0;
    /*memory index*/
-   int mi = 0;
+   int mi = 100;
    printf("%s", "start debug: ");
 
    while (i < strlen(inputText))
    {
+      printf("%c", ' ');
+
+      int wasDataCase = FALSE;
 
       i = skipBlank(i, inputText);
 
@@ -523,11 +526,77 @@ int main()
          symbols[indexSymbols].address = mi;
          indexSymbols++;
       }
+      else
+      {
+         if (isString(i, inputText))
+         {
+            /*get to string word*/
+            i = jumpToEndOfWord(i, inputText);
+            i = skipBlank(i, inputText);
+            /*skip "*/
+            i += 3;
 
-      i = jumpToEndOfWord(i, inputText);
-      i++;
+            /*get string length*/
+            int len = jumpToEndOfWord(i, inputText) - 2 - i;
 
-      mi++;
+            /*count the memory for the string*/
+            mi += len;
+         }
+         else
+         {
+            printf("%c", ' ');
+
+            if (isData(i, inputText))
+            {
+
+               /*skip .data word */
+               i = jumpToEndOfWord(i, inputText);
+               i = skipBlank(i, inputText);
+
+               /*get all integers*/
+               int bol = TRUE;
+
+               while (bol)
+               {
+                  /*to fix*/
+                  if (isDigit(inputText[i]))
+                  {
+                     /*count the memory for the numbers*/
+                     mi++;
+                  }
+                  while (isDigit(inputText[i]))
+                  {
+                     i++;
+                  }
+
+                  i = skipBlank(i, inputText);
+                  if (inputText[i] == ',')
+                  {
+                     i++;
+                     i = skipBlank(i, inputText);
+                  }
+                  else
+                  {
+                     bol = FALSE;
+                     wasDataCase = TRUE;
+                  }
+               }
+            }
+            else
+            {
+               if (!is_r_to_r_case(i, inputText))
+               {
+                  mi++;
+               }
+            }
+         }
+      }
+
+      if (!wasDataCase)
+      {
+         i = jumpToEndOfWord(i, inputText);
+      }
+      wasDataCase = FALSE;
    }
 
    i = 0;
@@ -538,6 +607,7 @@ int main()
    for (j = 0; j < (sizeof(symbols) / sizeof(symbols[0])); j++)
    {
       printf("%s", (symbols[j].name));
+      printf("%d", symbols[j].address);
       printf("%s", "/");
    }
    indexSymbols = 0;
@@ -671,7 +741,7 @@ int main()
    i = 0;
 
    int d_code[1000][12];
-   int dindex = 0;
+   int dindex = 100;
 
    while (i < strlen(newInput2))
    {
@@ -1194,16 +1264,21 @@ int main()
          int itmp2 = 0;
          while (bol)
          {
-
+            /*to fix*/
             while (isDigit(newInput2[i]))
             {
                strnum[itmp] = newInput2[i];
+               printf("%c", strnum[itmp]);
                itmp++;
                i++;
             }
 
+            strnum[itmp] = '\0';
+
             int n = toInt(strnum);
-            printf("%d",n);
+
+            printf("%d", n);
+
             int *num = decimalToBinary(n, 12);
 
             itmp = 0;
@@ -1225,8 +1300,9 @@ int main()
             {
                bol = FALSE;
             }
+            printf("%c", ' ');
+            dindex++;
          }
-         dindex++;
       }
 
       printf("%c", ' ');
@@ -1298,7 +1374,7 @@ int main()
    int y;
    int x;
 
-   for (y = 0; y < dindex; y++)
+   for (y = 100; y < dindex; y++)
    {
       for (x = 0; x < 12; x++)
       {
