@@ -776,7 +776,6 @@ int main()
          i = jumpToEndOfWord(i, newInput2);
          i = skipBlank(i, newInput2);
 
-         /* !!!impotant: the comma between operands needs to take in concidere here */
          int opcode_group = get_opcode_group(iopcode);
          if (opcode_group == 1)
          {
@@ -1272,16 +1271,14 @@ int main()
          /*get all integers*/
          int bol = TRUE;
 
-         char strnum[10];
-         int itmp = 0;
-         int itmp2 = 0;
          while (bol)
          {
-            /*to fix*/
+            char strnum[10];
+            int itmp = 0;
+
             while (isDigit(newInput2[i]))
             {
                strnum[itmp] = newInput2[i];
-               printf("%c", strnum[itmp]);
                itmp++;
                i++;
             }
@@ -1290,16 +1287,13 @@ int main()
 
             int n = toInt(strnum);
 
-            printf("%d", n);
-
             int *num = decimalToBinary(n, 12);
 
             itmp = 0;
-            itmp2 = 0;
 
             for (itmp = 0; itmp < 12; itmp++)
             {
-               d_code[dindex][itmp2] = num[itmp];
+               d_code[dindex][itmp] = num[itmp];
             }
 
             i = skipBlank(i, newInput2);
@@ -1314,8 +1308,8 @@ int main()
                bol = FALSE;
             }
             printf("%c", ' ');
-            dindex++;
          }
+         dindex++;
       }
 
       printf("%c", ' ');
