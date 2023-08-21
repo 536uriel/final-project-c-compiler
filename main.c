@@ -406,7 +406,7 @@ int toInt(char digits[])
 
 int isLetter(char c)
 {
-   if (c > 'a' && c < 'z')
+   if ((c > 'a' && c < 'z') || (c > 'A' && c < 'Z'))
    {
       return TRUE;
    }
@@ -499,10 +499,124 @@ int get_symbol_address(int itmp, char input[])
    return symbol_address;
 }
 
+/*helpers for debugging:*/
+
+int isWordFromLettersOnly(char word[])
+{
+   int i = 0;
+   int len = strlen(word);
+
+   while (isLetter(word[i]) && i < len)
+   {
+      i++;
+   }
+
+   if (i == len)
+   {
+      return TRUE;
+   }
+   else
+   {
+      return FALSE;
+   }
+}
+
+int isValidRegister(int i, char input[])
+{
+   if (input[i] == '@' && input[i + 1] == 'r' && input[i + 2] >= '0' && input[i + 2] < '8')
+   {
+      return TRUE;
+   }
+   else
+   {
+      return FALSE;
+   }
+}
+
+int isCommaBetweenWords(int i, char input[])
+{
+   if (isLetter(input[i]))
+   {
+      return FALSE;
+   }
+
+   i = skipBlank(i, input);
+
+   if (input[i] == ',')
+   {
+      return TRUE;
+   }
+   else
+   {
+      return FALSE;
+   }
+}
+
+int isSpaceAndOpcodeOrLabelDefAfterLastOperand(int i, char input[])
+{
+   if (i >= strlen(input))
+   {
+      return TRUE;
+   }
+
+   if (input[i] != ' ')
+   {
+      return FALSE;
+   }
+
+   i = skipBlank(i, input);
+
+   int iopcode = isOpCode(i, input);
+
+   int itmp = i;
+
+   i = jumpToEndOfWord(i, input);
+
+   int wordLen = i - itmp;
+   char word[wordLen];
+   int itmp2;
+   for (itmp2 = 0; itmp2 < wordLen; itmp2++)
+   {
+      word[itmp2] = input[itmp];
+      itmp++;
+   }
+
+   /*label defenition case*/
+   char label[wordLen - 1];
+   for (itmp2 = 0; itmp2 < wordLen - 1; itmp2++)
+   {
+      label[itmp2] = word[itmp2];
+   }
+
+   if (iopcode != -1)
+   {
+
+      /*opcode case*/
+      return TRUE;
+   }
+   else
+   {
+      if (word[wordLen - 1] == ':')
+      {
+
+         /*label case*/
+         return TRUE;
+      }
+      else
+      {
+         printf("%c", ' ');
+         printf("%s", "not opcode after operands");
+         return FALSE;
+      }
+   }
+}
+
+/*to do: add special decoding cases for cmp and lea opcodes*/
+
 int main()
 {
 
-   printf("%s", "start debug: ");
+   printf("%s", "start main: ");
 
    char *inputText = readFileToString("input.txt");
    /*input index*/
@@ -616,9 +730,8 @@ int main()
       i++;
    }
 
-   i = 0;
-
    /*create symbols*/
+   i = 0;
 
    /*memory index*/
    int mi = 100;
@@ -745,12 +858,13 @@ int main()
 
    // /*new code here****************************************** */
 
-   // /*convert newinput to binary*/
+   // /* convert newinput to binary and check for errors: */
 
    i = 0;
 
    int d_code[1000][12];
    int dindex = 100;
+   int isError = FALSE;
 
    while (i < strlen(newInput2))
    {
@@ -780,6 +894,7 @@ int main()
          if (opcode_group == 1)
          {
 
+            /* to do: check here for errors */
             if (isDigit(newInput2[i]))
             {
 
@@ -832,6 +947,12 @@ int main()
                dindex--;
                if (newInput2[i] == '@')
                {
+                  if (!isValidRegister(i, newInput2))
+                  {
+                     printf("%s", "unvalid register");
+                     isError = TRUE;
+                  }
+
                   /*register case*/
                   d_code[dindex][2] = 1;
                   d_code[dindex][3] = 0;
@@ -891,26 +1012,47 @@ int main()
                }
             }
 
-            /*if the sccond operand is not a number
+            /*if the first operand is not a number
             check if it is a register or label*/
 
-            /*if the scond operand is a register*/
+            /*if the first operand is a register*/
             if (newInput2[i] == '@')
             {
+               /*debug*/
+               if (!isValidRegister(i, newInput2))
+               {
+                  printf("%s", "unvalid register");
+                  isError = TRUE;
+               }
+
                i += 2;
                int rnum1 = newInput2[i] - '0';
                /*get after register*/
                i++;
 
-               /*skip the comma letter and get to next operand*/
+               /*debug*/
+               if (!isCommaBetweenWords(i, newInput2))
+               {
+                  printf("%s", "unvalid syntax");
+               }
+
                i = skipBlank(i, newInput2);
+               /*skip the comma letter*/
                i++;
+
                i = skipBlank(i, newInput2);
 
-               /*if the 3 operand is a register*/
+               /*if the scond operand is a register*/
                if (newInput2[i] == '@')
                {
                   printf("%s", "got to register to register case");
+
+                  /*debug*/
+                  if (!isValidRegister(i, newInput2))
+                  {
+                     printf("%s", "unvalid register");
+                     isError = TRUE;
+                  }
 
                   i += 2;
                   int rnum2 = newInput2[i] - '0';
@@ -962,12 +1104,13 @@ int main()
                }
                else
                {
-                  printf("%s", "got to regiter to label case");
+                  printf("%s", "got to regsiter to label case");
 
-                  /*if the 3 operand is a label*/
+                  /*if the scond operand is a label*/
                   /*get label string*/
                   int itmp = i;
                   i = jumpToEndOfWord(i, newInput2);
+
                   int labelen = i - itmp;
                   char label[labelen];
                   int itmp2;
@@ -1108,6 +1251,14 @@ int main()
                   d_code[dindex][11] = 0;
                }
             }
+
+            /*debug*/
+
+            if (!isSpaceAndOpcodeOrLabelDefAfterLastOperand(i, newInput2))
+            {
+               printf("%s", " syntax error");
+               return -1;
+            }
          }
 
          if (opcode_group == 2)
@@ -1235,6 +1386,14 @@ int main()
                   }
                }
             }
+
+            /*debug*/
+
+            if (!isSpaceAndOpcodeOrLabelDefAfterLastOperand(i, newInput2))
+            {
+               printf("%s", " syntax error");
+               return -1;
+            }
          }
 
          if (opcode_group == 3)
@@ -1258,6 +1417,19 @@ int main()
             d_code[dindex][11] = 0;
          }
          dindex++;
+
+         /*debug*/
+
+         int itest = jumpToEndOfWord(i,newInput2);
+         itest = skipBlank(itest,newInput2);
+         itest = jumpToEndOfWord(itest,newInput2);
+         
+         /* to fix: */
+         // if (!isSpaceAndOpcodeOrLabelDefAfterLastOperand(itest, newInput2))
+         // {
+         //    printf("%s", " syntax error");
+         //    // return -1;
+         // }
       }
 
       if (isData(i, newInput2))
@@ -1368,6 +1540,13 @@ int main()
       }
 
       i = jumpToEndOfWord(i, newInput2);
+   }
+
+   /*check for errors*/
+   if (isError)
+   {
+      printf("%s", "syntax error in input file. exit program.");
+      return -1;
    }
 
    /* convert d_code binary array ro base64 letters:*/
