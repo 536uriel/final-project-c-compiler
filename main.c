@@ -499,9 +499,10 @@ int get_symbol_index(int itmp, char input[])
    int j;
    int bool = FALSE;
    int tmpindex = -1;
-   for (i2 = 0; i2 < sizeof(symbols); i2++)
+   for (i2 = 0; i2 < (sizeof(symbols) / sizeof(symbols[0])); i2++)
    {
-      for (j = 0; j < sizeof(symbols[i2].name); j++)
+
+      for (j = 0; j < strlen(symbole_name); j++)
       {
          if (symbols[i2].name[j] == symbole_name[j])
          {
@@ -669,7 +670,7 @@ int isSpaceAndOpcodeOrLabelDefAfterLastOperand(int i, char input[])
       }
       else
       {
-         
+
          printf("%c", ' ');
          printf("%s", "not opcode after operands");
          return FALSE;
@@ -915,6 +916,7 @@ int main()
    }
    indexSymbols = 0;
 
+   /*to fix:*/
    /*define if symbol is external or not*/
 
    /*first define any symbol to not external by default*/
@@ -932,15 +934,18 @@ int main()
 
       if (isExtern(i, newInput2))
       {
+         printf("%s", "extern case");
+
          /*jump after extern commend*/
          i = jumpToEndOfWord(i, newInput2);
          i = skipBlank(i, newInput2);
 
          int tmpindex = get_symbol_index(i, newInput2);
+         printf("%d", tmpindex);
 
          if (tmpindex != -1)
          {
-            symbols[tmpindex].isExtern == TRUE;
+            symbols[tmpindex].isExtern = TRUE;
          }
       }
 
@@ -1106,6 +1111,17 @@ int main()
                   int sindex = getSymbolIndex(label);
                   int *num = decimalToBinary(symbols[sindex].address, 10);
 
+                  if (symbols[sindex].isExtern)
+                  {
+                     d_code[dindex][0] = 1;
+                     d_code[dindex][1] = 0;
+                  }
+                  else
+                  {
+                     d_code[dindex][0] = 0;
+                     d_code[dindex][1] = 1;
+                  }
+
                   itmp = 2;
                   itmp2 = 0;
 
@@ -1269,6 +1285,7 @@ int main()
                   }
                   else
                   {
+
                      d_code[dindex][0] = 0;
                      d_code[dindex][1] = 1;
                   }
@@ -1674,8 +1691,8 @@ int main()
    /*check for errors*/
    if (isError)
    {
-      printf("%s", "syntax error in input file. exit program.");
-      return -1;
+      printf("%s", "syntax error in input file.");
+      /*return -1;*/
    }
 
    /* convert d_code binary array ro base64 letters:*/
