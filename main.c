@@ -557,7 +557,7 @@ int isSpaceAndOpcodeOrLabelDefAfterLastOperand(int i, char input[])
 
    i = skipBlank(i, input);
 
-   if (i >= strlen(input))
+   if (i >= strlen(input) - 1)
    {
       return TRUE;
    }
@@ -600,7 +600,6 @@ int isSpaceAndOpcodeOrLabelDefAfterLastOperand(int i, char input[])
       }
       else
       {
-
          printf("%c", ' ');
          printf("%s", "not opcode after operands");
          return FALSE;
@@ -1248,7 +1247,6 @@ int main()
                   d_code[dindex][11] = 0;
                }
             }
-
          }
 
          if (opcode_group == 2)
@@ -1376,7 +1374,6 @@ int main()
                   }
                }
             }
-
          }
 
          if (opcode_group == 3)
@@ -1462,6 +1459,14 @@ int main()
             printf("%c", ' ');
          }
          dindex++;
+
+         /*debug*/
+
+         if (!isSpaceAndOpcodeOrLabelDefAfterLastOperand(i, newInput2))
+         {
+            printf("%s", " syntax error");
+            /*return -1;*/
+         }
       }
 
       printf("%c", ' ');
