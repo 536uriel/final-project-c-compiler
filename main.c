@@ -1408,7 +1408,7 @@ int main()
          if (!isSpaceAndOpcodeOrLabelDefAfterLastOperand(i, newInput2))
          {
             printf("%s", " syntax error");
-            return -1;
+            /*return -1;*/
          }
       }
 
