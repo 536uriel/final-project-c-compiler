@@ -1511,6 +1511,14 @@ int main()
 
             dindex++;
          }
+
+         i = jumpToEndOfWord(i, newInput2);
+
+         if (!isSpaceAndOpcodeOrLabelDefAfterLastOperand(i, newInput2))
+         {
+            printf("%s", " syntax error");
+            /*return -1;*/
+         }
       }
 
       printf("%c", ' ');
