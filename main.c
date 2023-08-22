@@ -669,6 +669,7 @@ int isSpaceAndOpcodeOrLabelDefAfterLastOperand(int i, char input[])
       }
       else
       {
+         
          printf("%c", ' ');
          printf("%s", "not opcode after operands");
          return FALSE;
