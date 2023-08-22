@@ -139,6 +139,7 @@ struct Symbol
 {
    int address;
    char name[20];
+   int isExtern;
 };
 
 struct Symbol symbols[100];
@@ -359,6 +360,30 @@ int isExternOrEntry(int i, char input[])
    }
 }
 
+int isExtern(int i, char input[])
+{
+   if (isWordMatch(i, ".extern", input))
+   {
+      return TRUE;
+   }
+   else
+   {
+      return FALSE;
+   }
+}
+
+int isEntry(int i, char input[])
+{
+   if (isWordMatch(i, ".entry", input))
+   {
+      return TRUE;
+   }
+   else
+   {
+      return FALSE;
+   }
+}
+
 int isDigit(char c)
 {
    if (c >= '0' && c <= '9' || c == '-')
@@ -459,9 +484,9 @@ int get_opcode_group(int iopcode)
    }
 }
 
-int get_symbol_address(int itmp, char input[])
+int get_symbol_index(int itmp, char input[])
 {
-   /*find the symbol address*/
+   /*find the symbol index*/
    int i2;
    char symbole_name[20];
    int symbolen = jumpToEndOfWord(itmp, input) - itmp;
@@ -473,7 +498,7 @@ int get_symbol_address(int itmp, char input[])
 
    int j;
    int bool = FALSE;
-   int tmpindex;
+   int tmpindex = -1;
    for (i2 = 0; i2 < sizeof(symbols); i2++)
    {
       for (j = 0; j < sizeof(symbols[i2].name); j++)
@@ -495,6 +520,14 @@ int get_symbol_address(int itmp, char input[])
       }
    }
 
+   return tmpindex;
+}
+
+int get_symbol_address(int itmp, char input[])
+{
+   /*find the symbol address*/
+
+   int tmpindex = get_symbol_index(itmp, input);
    int symbol_address = symbols[tmpindex].address;
    return symbol_address;
 }
@@ -881,6 +914,38 @@ int main()
    }
    indexSymbols = 0;
 
+   /*define if symbol is external or not*/
+
+   /*first define any symbol to not external by default*/
+   for (j = 0; j < (sizeof(symbols) / sizeof(symbols[0])); j++)
+   {
+      symbols[j].isExtern = FALSE;
+   }
+
+   i = 0;
+
+   while (i < strlen(newInput2))
+   {
+      printf("%c", ' ');
+      i = skipBlank(i, newInput2);
+
+      if (isExtern(i, newInput2))
+      {
+         /*jump after extern commend*/
+         i = jumpToEndOfWord(i, newInput2);
+         i = skipBlank(i, newInput2);
+
+         int tmpindex = get_symbol_index(i, newInput2);
+
+         if (tmpindex != -1)
+         {
+            symbols[tmpindex].isExtern == TRUE;
+         }
+      }
+
+      i = jumpToEndOfWord(i, newInput2);
+   }
+
    /* until here its first level of the compliler */
 
    // /*until here summery:
@@ -905,7 +970,7 @@ int main()
 
       /*debug*/
 
-      if(!isValidWord(i,newInput2))
+      if (!isValidWord(i, newInput2))
       {
          isError = TRUE;
       }
@@ -1193,11 +1258,19 @@ int main()
                   /*decode the label operand*/
                   dindex++;
 
-                  d_code[dindex][0] = 0;
-                  d_code[dindex][1] = 1;
-
                   int sindex = getSymbolIndex(label);
                   int *num = decimalToBinary(symbols[sindex].address, 10);
+
+                  if (symbols[sindex].isExtern)
+                  {
+                     d_code[dindex][0] = 1;
+                     d_code[dindex][1] = 0;
+                  }
+                  else
+                  {
+                     d_code[dindex][0] = 0;
+                     d_code[dindex][1] = 1;
+                  }
 
                   itmp = 2;
                   itmp2 = 0;
@@ -1255,11 +1328,19 @@ int main()
                   /*decode the label case*/
                   dindex++;
 
-                  d_code[dindex][0] = 0;
-                  d_code[dindex][1] = 1;
-
                   int sindex = getSymbolIndex(label);
                   int *num = decimalToBinary(symbols[sindex].address, 10);
+
+                  if (symbols[sindex].isExtern)
+                  {
+                     d_code[dindex][0] = 1;
+                     d_code[dindex][1] = 0;
+                  }
+                  else
+                  {
+                     d_code[dindex][0] = 0;
+                     d_code[dindex][1] = 1;
+                  }
 
                   itmp = 2;
                   itmp2 = 0;
@@ -1406,6 +1487,17 @@ int main()
 
                   int sindex = getSymbolIndex(label);
                   int *num = decimalToBinary(symbols[sindex].address, 10);
+
+                  if (symbols[sindex].isExtern)
+                  {
+                     d_code[dindex][0] = 1;
+                     d_code[dindex][1] = 0;
+                  }
+                  else
+                  {
+                     d_code[dindex][0] = 0;
+                     d_code[dindex][1] = 1;
+                  }
 
                   itmp = 2;
                   itmp2 = 0;
