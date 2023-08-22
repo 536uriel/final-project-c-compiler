@@ -552,6 +552,49 @@ int isCommaBetweenWords(int i, char input[])
    }
 }
 
+int isValidWord(int i, char input[])
+{
+   int isR = isValidRegister(i, input);
+   int isSymb = isSymbol(i, input);
+   int isDt = isData(i, input);
+   int isStr = isString(i, input);
+   int isEorE = isExternOrEntry(i, input);
+
+   int iopcode = isOpCode(i, input);
+
+   int itmp = i;
+
+   i = jumpToEndOfWord(i, input);
+
+   int wordLen = i - itmp;
+   char word[wordLen];
+   int itmp2;
+   for (itmp2 = 0; itmp2 < wordLen; itmp2++)
+   {
+      word[itmp2] = input[itmp];
+      itmp++;
+   }
+
+   int isNum = TRUE;
+
+   for (itmp2 = 0; itmp2 < wordLen; itmp2++)
+   {
+      if (!isDigit(word[itmp2]))
+      {
+         isNum = FALSE;
+      }
+   }
+
+   if (isLetter(word[0]) && word[wordLen] != ':' && iopcode == -1 && !isNum && !isR && !isSymb && !isDt && !isStr && !isEorE)
+   {
+      return FALSE;
+   }
+   else
+   {
+      return TRUE;
+   }
+}
+
 int isSpaceAndOpcodeOrLabelDefAfterLastOperand(int i, char input[])
 {
 
@@ -575,13 +618,6 @@ int isSpaceAndOpcodeOrLabelDefAfterLastOperand(int i, char input[])
    {
       word[itmp2] = input[itmp];
       itmp++;
-   }
-
-   /*label defenition case*/
-   char label[wordLen - 1];
-   for (itmp2 = 0; itmp2 < wordLen - 1; itmp2++)
-   {
-      label[itmp2] = word[itmp2];
    }
 
    if (iopcode != -1)
@@ -866,6 +902,13 @@ int main()
    {
       printf("%c", ' ');
       i = skipBlank(i, newInput2);
+
+      /*debug*/
+
+      if(!isValidWord(i,newInput2))
+      {
+         isError = TRUE;
+      }
 
       int iopcode = isOpCode(i, newInput2);
       if (iopcode != -1)
