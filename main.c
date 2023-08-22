@@ -633,7 +633,7 @@ int isSpaceAndOpcodeOrLabelDefAfterLastOperand(int i, char input[])
 
    i = skipBlank(i, input);
 
-   if (i >= strlen(input) - 1)
+   if (i >= strlen(input) - 1 || input[i] == EOF)
    {
       return TRUE;
    }
