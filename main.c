@@ -554,17 +554,13 @@ int isCommaBetweenWords(int i, char input[])
 
 int isSpaceAndOpcodeOrLabelDefAfterLastOperand(int i, char input[])
 {
+
+   i = skipBlank(i, input);
+
    if (i >= strlen(input))
    {
       return TRUE;
    }
-
-   if (input[i] != ' ')
-   {
-      return FALSE;
-   }
-
-   i = skipBlank(i, input);
 
    int iopcode = isOpCode(i, input);
 
@@ -604,6 +600,7 @@ int isSpaceAndOpcodeOrLabelDefAfterLastOperand(int i, char input[])
       }
       else
       {
+
          printf("%c", ' ');
          printf("%s", "not opcode after operands");
          return FALSE;
@@ -1252,13 +1249,6 @@ int main()
                }
             }
 
-            /*debug*/
-
-            if (!isSpaceAndOpcodeOrLabelDefAfterLastOperand(i, newInput2))
-            {
-               printf("%s", " syntax error");
-               return -1;
-            }
          }
 
          if (opcode_group == 2)
@@ -1387,13 +1377,6 @@ int main()
                }
             }
 
-            /*debug*/
-
-            if (!isSpaceAndOpcodeOrLabelDefAfterLastOperand(i, newInput2))
-            {
-               printf("%s", " syntax error");
-               return -1;
-            }
          }
 
          if (opcode_group == 3)
@@ -1415,21 +1398,18 @@ int main()
             d_code[dindex][9] = 0;
             d_code[dindex][10] = 0;
             d_code[dindex][11] = 0;
+
+            int i = jumpToEndOfWord(i, newInput2);
          }
          dindex++;
 
          /*debug*/
 
-         int itest = jumpToEndOfWord(i,newInput2);
-         itest = skipBlank(itest,newInput2);
-         itest = jumpToEndOfWord(itest,newInput2);
-         
-         /* to fix: */
-         // if (!isSpaceAndOpcodeOrLabelDefAfterLastOperand(itest, newInput2))
-         // {
-         //    printf("%s", " syntax error");
-         //    // return -1;
-         // }
+         if (!isSpaceAndOpcodeOrLabelDefAfterLastOperand(i, newInput2))
+         {
+            printf("%s", " syntax error");
+            return -1;
+         }
       }
 
       if (isData(i, newInput2))
