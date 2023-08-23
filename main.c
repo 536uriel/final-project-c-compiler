@@ -108,8 +108,8 @@ char *readFileToString(const char *filename)
       long length = ftell(file);
       fseek(file, 0, SEEK_SET);
 
-      // Allocate memory for the string, including the null terminator
-      char *content = (char *)malloc(length + 1);
+      // Allocate memory for the string, including the sapce added and null terminator 
+      char *content = (char *)malloc(length + 2);
       if (!content)
       {
          fclose(file);
@@ -118,7 +118,9 @@ char *readFileToString(const char *filename)
 
       // Read the file into the allocated memory
       fread(content, 1, length, file);
-      content[length] = '\0'; // Null-terminate the string
+      /*add spce to the end of content*/
+      content[length] = ' ';
+      content[length + 1] = '\0'; // Null-terminate the string
 
       fclose(file);
       return content;
@@ -496,6 +498,9 @@ int get_symbol_index(int itmp, char input[])
       itmp++;
    }
 
+   symbole_name[symbolen] = '\0';
+
+   printf("%s",symbole_name);
    int j;
    int bool = FALSE;
    int tmpindex = -1;
