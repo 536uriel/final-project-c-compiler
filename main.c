@@ -108,7 +108,7 @@ char *readFileToString(const char *filename)
       long length = ftell(file);
       fseek(file, 0, SEEK_SET);
 
-      // Allocate memory for the string, including the sapce added and null terminator 
+      // Allocate memory for the string, including the sapce added and null terminator
       char *content = (char *)malloc(length + 2);
       if (!content)
       {
@@ -142,6 +142,7 @@ struct Symbol
    int address;
    char name[20];
    int isExtern;
+   int isEntry;
 };
 
 struct Symbol symbols[100];
@@ -500,7 +501,7 @@ int get_symbol_index(int itmp, char input[])
 
    symbole_name[symbolen] = '\0';
 
-   printf("%s",symbole_name);
+   printf("%s", symbole_name);
    int j;
    int bool = FALSE;
    int tmpindex = -1;
@@ -951,6 +952,25 @@ int main()
          if (tmpindex != -1)
          {
             symbols[tmpindex].isExtern = TRUE;
+         }
+      }
+
+      printf("%c", ' ');
+
+      if (isEntry(i, newInput2))
+      {
+         printf("%s", "entry case");
+
+         /*jump after entry commend*/
+         i = jumpToEndOfWord(i, newInput2);
+         i = skipBlank(i, newInput2);
+
+         int tmpindex = get_symbol_index(i, newInput2);
+         printf("%d", tmpindex);
+
+         if (tmpindex != -1)
+         {
+            symbols[tmpindex].isEntry = TRUE;
          }
       }
 
@@ -1714,9 +1734,9 @@ int main()
       printf("%c", ' ');
    }
 
-   char decodingResultStr[dindex][2];
+   char decodingResultStr[dindex + 100][2];
 
-   for (y = 0; y < dindex; y++)
+   for (y = 100; y < (dindex + 100); y++)
    {
       char *strTmp = convertArrayToBase64(d_code[y]);
 
@@ -1732,7 +1752,7 @@ int main()
    char outputStr[slen];
    int indexTmp = 0;
 
-   for (y = 0; y < dindex; y++)
+   for (y = 100; y < (dindex + 100); y++)
    {
       outputStr[indexTmp] = decodingResultStr[y][0];
       indexTmp++;
@@ -1764,7 +1784,77 @@ int main()
 
    printf("Data written to ps.ob\n");
 
-   /*end new code here*************************************** */
+   // Pointer to the file
+   FILE *entfile;
+
+   // Open a file in write mode. If the file doesn't exist, it will be created.
+   // If it exists, its contents will be overwritten.
+   entfile = fopen("ps.ent", "w");
+   // extfile = fopen("ps.ext", "w");
+
+   // Check if the file was opened successfully
+   if (entfile == NULL)
+   {
+      printf("Error opening the file!\n");
+      return 1; // Return an error code
+   }
+
+   for (i = 0; i < (sizeof(symbols) / sizeof(symbols[0])); i++)
+   {
+      if (symbols[i].isEntry)
+      {
+         printf("%s", "entry case");
+         // Write some text to the file
+         fprintf(entfile, symbols[i].name);
+         fprintf(entfile, " ");
+         char address[10];
+         /*convert int to string*/
+         sprintf(address, "%d", symbols[i].address);
+         fprintf(entfile, address);
+         fprintf(entfile, "\n");
+      }
+   }
+
+   // Close the files
+   fclose(entfile);
+
+   printf("Data written ent file\n");
+
+   // Pointer to the file
+   FILE *extfile;
+
+   // Open a file in write mode. If the file doesn't exist, it will be created.
+   // If it exists, its contents will be overwritten.
+   extfile = fopen("ps.ext", "w");
+   // extfile = fopen("ps.ext", "w");
+
+   // Check if the file was opened successfully
+   if (extfile == NULL)
+   {
+      printf("Error opening the file!\n");
+      return 1; // Return an error code
+   }
+
+   for (i = 0; i < (sizeof(symbols) / sizeof(symbols[0])); i++)
+   {
+      if (symbols[i].isExtern)
+      {
+         printf("%s", "extern case");
+         // Write some text to the file
+         fprintf(extfile, symbols[i].name);
+         fprintf(extfile, " ");
+         char address[10];
+         // /*convert int to string*/
+         sprintf(address, "%d", symbols[i].address);
+         fprintf(extfile, address);
+         fprintf(extfile, "\n");
+      }
+   }
+
+   // Close the files
+   fclose(extfile);
+
+   printf("Data written ext file\n");
 
    return 0;
 }
