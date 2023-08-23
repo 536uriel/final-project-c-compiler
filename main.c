@@ -994,6 +994,9 @@ int main()
    int dindex = 100;
    int isError = FALSE;
 
+   int cntCommends = 0;
+   int cntData = 0;
+
    while (i < strlen(newInput2))
    {
       printf("%c", ' ');
@@ -1028,10 +1031,14 @@ int main()
          int opcode_group = get_opcode_group(iopcode);
          if (opcode_group == 1)
          {
+            /*count for 2 operands*/
+            cntCommends += 2;
 
             /* to do: check here for errors */
             if (isDigit(newInput2[i]))
             {
+               /*count for data*/
+               cntData++;
 
                int *binary_opcode = decimalToBinary(iopcode, 4);
 
@@ -1418,6 +1425,9 @@ int main()
 
          if (opcode_group == 2)
          {
+            /*count for 1 operand*/
+            cntCommends += 1;
+
             d_code[dindex][0] = 0;
             d_code[dindex][1] = 0;
 
@@ -1463,6 +1473,8 @@ int main()
 
                if (isDigit(newInput2[i]))
                {
+                  /*count for data*/
+                  cntData++;
 
                   /* number case*/
 
@@ -1605,6 +1617,10 @@ int main()
 
             while (isDigit(newInput2[i]))
             {
+               /*count the first operand and data of .data*/
+               cntCommends++;
+               cntData++;
+
                strnum[itmp] = newInput2[i];
                itmp++;
                i++;
@@ -1626,6 +1642,10 @@ int main()
             i = skipBlank(i, newInput2);
             if (newInput2[i] == ',')
             {
+               /* count for data and operands of .data */
+               cntCommends++;
+               cntData++;
+
                i++;
                i = skipBlank(i, newInput2);
                dindex++;
@@ -1651,6 +1671,9 @@ int main()
 
       if (isString(i, newInput2))
       {
+         /*count for .string operands*/
+         cntCommends++;
+
          printf("%s", "got to .string");
          /*skip .string*/
          i = jumpToEndOfWord(i, newInput2);
@@ -1668,6 +1691,9 @@ int main()
          /*put string into str*/
          for (itmp = 0; itmp < len - 1; itmp++)
          {
+            /*count for .string data*/
+            cntData++;
+
             str[itmp] = newInput2[i];
             i++;
          }
@@ -1703,6 +1729,9 @@ int main()
 
       if (isExternOrEntry(i, newInput2))
       {
+         /*count for external or entry operands*/
+         cntCommends++;
+
          i = jumpToEndOfWord(i, newInput2);
          i = skipBlank(i, newInput2);
 
@@ -1748,9 +1777,17 @@ int main()
       printf("%c", ' ');
    }
 
-   int slen = dindex * 3;
+   int slen = dindex + 100;
    char outputStr[slen];
    int indexTmp = 0;
+
+   char cnt1[10];
+   // /*convert int to string*/
+   sprintf(cnt1, "%d", cntCommends);
+
+   char cnt2[10];
+   // /*convert int to string*/
+   sprintf(cnt2, "%d", cntData);
 
    for (y = 100; y < (dindex + 100); y++)
    {
@@ -1777,6 +1814,8 @@ int main()
    }
 
    // Write some text to the file
+   fprintf(file, cnt1);
+   fprintf(file, cnt2);
    fprintf(file, outputStr);
 
    // Close the file
