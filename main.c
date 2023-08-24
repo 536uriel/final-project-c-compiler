@@ -1002,6 +1002,21 @@ int main()
       printf("%c", ' ');
       i = skipBlank(i, newInput2);
 
+      if (isExternOrEntry(i, newInput2))
+      {
+         /*count the first operand and data of .data*/
+         cntCommends++;
+         cntData++;
+
+         i = jumpToEndOfWord(i, newInput2);
+         i = skipBlank(i, newInput2);
+
+         i = jumpToEndOfWord(i, newInput2);
+         i = skipBlank(i, newInput2);
+      }
+
+      printf("%c", ' ');
+
       /*debug*/
 
       if (!isValidWord(i, newInput2))
@@ -1009,6 +1024,7 @@ int main()
          isError = TRUE;
       }
 
+      /*convert to binary*/
       int iopcode = isOpCode(i, newInput2);
       if (iopcode != -1)
       {
@@ -1601,6 +1617,10 @@ int main()
 
       if (isData(i, newInput2))
       {
+         /*count the first operand and data of .data*/
+         cntCommends++;
+         cntData++;
+
          printf("%s", "got to .data");
 
          /*skip .data word */
@@ -1617,9 +1637,6 @@ int main()
 
             while (isDigit(newInput2[i]))
             {
-               /*count the first operand and data of .data*/
-               cntCommends++;
-               cntData++;
 
                strnum[itmp] = newInput2[i];
                itmp++;
@@ -1727,18 +1744,6 @@ int main()
 
       printf("%c", ' ');
 
-      if (isExternOrEntry(i, newInput2))
-      {
-         /*count for external or entry operands*/
-         cntCommends++;
-
-         i = jumpToEndOfWord(i, newInput2);
-         i = skipBlank(i, newInput2);
-
-         i = jumpToEndOfWord(i, newInput2);
-         i = skipBlank(i, newInput2);
-      }
-
       i = jumpToEndOfWord(i, newInput2);
    }
 
@@ -1752,6 +1757,24 @@ int main()
    /* convert d_code binary array ro base64 letters:*/
    int y;
    int x;
+   int z = 11;
+
+   /*revers d_code array*/
+   for (y = 100; y < dindex; y++)
+   {
+      int start = 0;
+      int end = 11;
+      int temp;
+      while (start < end)
+      {
+         temp = d_code[y][start];
+         d_code[y][start] = d_code[y][end];
+         d_code[y][end] = temp;
+         start++;
+         end--;
+      }
+      printf("%c", ' ');
+   }
 
    for (y = 100; y < dindex; y++)
    {
@@ -1760,12 +1783,13 @@ int main()
          /*for testing*/
          printf("%d", d_code[y][x]);
       }
+
       printf("%c", ' ');
    }
 
-   char decodingResultStr[dindex + 100][2];
+   char decodingResultStr[dindex][2];
 
-   for (y = 100; y < (dindex + 100); y++)
+   for (y = 100; y < dindex; y++)
    {
       char *strTmp = convertArrayToBase64(d_code[y]);
 
@@ -1777,7 +1801,7 @@ int main()
       printf("%c", ' ');
    }
 
-   int slen = dindex + 100;
+   int slen = dindex;
    char outputStr[slen];
    int indexTmp = 0;
 
@@ -1789,15 +1813,17 @@ int main()
    // /*convert int to string*/
    sprintf(cnt2, "%d", cntData);
 
-   for (y = 100; y < (dindex + 100); y++)
+   for (y = 100; y < dindex; y++)
    {
       outputStr[indexTmp] = decodingResultStr[y][0];
       indexTmp++;
       outputStr[indexTmp] = decodingResultStr[y][1];
       indexTmp++;
-      outputStr[indexTmp] = ' ';
+      outputStr[indexTmp] = '\n';
       indexTmp++;
    }
+
+   outputStr[indexTmp] = EOF;
 
    // Pointer to the file
    FILE *file;
