@@ -2,10 +2,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include "limits.h";
+#include "limits.h"
 
 #define FALSE 0;
 #define TRUE 1;
+/*int PATH_MAX = 1000;*/
 
 /* Base64 character set*/
 char base64_chars[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
@@ -22,15 +23,16 @@ char getBase64Char(int val)
 char *convertArrayToBase64(int arr[12])
 {
    int first6 = 0, next6 = 0;
+   int i;
 
    /* Convert the first 6 cells into a single integer*/
-   for (int i = 0; i < 6; i++)
+   for (i = 0; i < 6; i++)
    {
       first6 = (first6 << 1) | (arr[i] & 0x01);
    }
 
    /* Convert the next 6 cells into a single integer*/
-   for (int i = 6; i < 12; i++)
+   for (i = 6; i < 12; i++)
    {
       next6 = (next6 << 1) | (arr[i] & 0x01);
    }
@@ -47,6 +49,7 @@ char *convertArrayToBase64(int arr[12])
 int *decimalToBinary(int num, int array_size)
 {
    int *arr = (int *)malloc(sizeof(int) * array_size);
+   int i;
    if (!arr)
    {
       perror("Failed to allocate memory");
@@ -54,7 +57,7 @@ int *decimalToBinary(int num, int array_size)
    }
 
    /* Initialize the array to all zeros.*/
-   for (int i = 0; i < array_size; i++)
+   for (i = 0; i < array_size; i++)
    {
       arr[i] = 0;
    }
@@ -62,9 +65,9 @@ int *decimalToBinary(int num, int array_size)
    /* If the number is negative, calculate its 2's complement.*/
    if (num < 0)
    {
-      num = -num; // Take the absolute value.
-      num = ~num; // Invert the bits.
-      num += 1;   // Add 1.
+      num = -num; 
+      num = ~num; 
+      num += 1;   
    }
 
    /* Convert the number to binary and store it in the array.*/
@@ -83,7 +86,7 @@ char *readFileToString(const char *filename)
 {
 
    char *cwd;
-   char buff[PATH_MAX + 1];
+   char buff[(PATH_MAX + 1)];
 
    cwd = getcwd(buff, PATH_MAX + 1);
    if (cwd != NULL)
@@ -683,7 +686,7 @@ int isSpaceAndOpcodeOrLabelDefAfterLastOperand(int i, char input[])
    }
 }
 
-/*to do: add special decoding cases for cmp and lea opcodes*/
+
 
 int main()
 {
@@ -1894,7 +1897,7 @@ int main()
 
    printf("Data written ent file\n");
 
-   // Pointer to the file
+
    FILE *extfile;
 
 
