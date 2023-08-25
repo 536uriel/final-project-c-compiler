@@ -691,7 +691,7 @@ int main()
 
    printf("%s", "start main: ");
 
-   char *inputText = readFileToString("input.txt");
+   char *inputText = readFileToString("ps.as");
    /*input index*/
    int i = 0;
 
