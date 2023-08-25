@@ -6,7 +6,11 @@
 
 #define FALSE 0;
 #define TRUE 1;
-/*int PATH_MAX = 1000;*/
+int path_max = 1024;
+
+char result[3];
+struct Mcro m;
+
 
 /* Base64 character set*/
 char base64_chars[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
@@ -22,7 +26,10 @@ char getBase64Char(int val)
 
 char *convertArrayToBase64(int arr[12])
 {
-   int first6 = 0, next6 = 0;
+   int first6;
+   first6 = 0;
+   int next6;
+   next6 = 0;
    int i;
 
    /* Convert the first 6 cells into a single integer*/
@@ -38,7 +45,6 @@ char *convertArrayToBase64(int arr[12])
    }
 
    /* Convert the two integers into Base64 characters*/
-   static char result[3];
    result[0] = getBase64Char(first6);
    result[1] = getBase64Char(next6);
    result[2] = '\0';
@@ -48,7 +54,8 @@ char *convertArrayToBase64(int arr[12])
 
 int *decimalToBinary(int num, int array_size)
 {
-   int *arr = (int *)malloc(sizeof(int) * array_size);
+   int *arr;
+   arr = (int *)malloc(sizeof(int) * array_size);
    int i;
    if (!arr)
    {
@@ -65,13 +72,14 @@ int *decimalToBinary(int num, int array_size)
    /* If the number is negative, calculate its 2's complement.*/
    if (num < 0)
    {
-      num = -num; 
-      num = ~num; 
-      num += 1;   
+      num = -num;
+      num = ~num;
+      num += 1;
    }
 
    /* Convert the number to binary and store it in the array.*/
-   int index = 0;
+   int index;
+   index = 0;
    while (num && index < array_size)
    {
       arr[index] = num & 1;
@@ -86,20 +94,21 @@ char *readFileToString(const char *filename)
 {
 
    char *cwd;
-   char buff[(PATH_MAX + 1)];
+   char buff[(path_max + 1)];
 
-   cwd = getcwd(buff, PATH_MAX + 1);
+   cwd = getcwd(buff, path_max + 1);
    if (cwd != NULL)
    {
       printf("Current working directory: %s\n", cwd);
 
       /* If you have a file name, say "myfile.txt" in the current directory,*/
       /* you can create its full path as follows:*/
-      char full_path[PATH_MAX + 1];
+      char full_path[path_max + 1];
       snprintf(full_path, sizeof(full_path), "%s/%s", cwd, filename);
       printf("Full path: %s\n", full_path);
 
-      FILE *file = fopen(filename, "r"); /* Open the file in read mode*/
+      FILE *file;
+      file = fopen(filename, "r"); /* Open the file in read mode*/
       if (!file)
       {
          perror(filename);
@@ -108,11 +117,13 @@ char *readFileToString(const char *filename)
 
       /*Determine the size of the file*/
       fseek(file, 0, SEEK_END);
-      long length = ftell(file);
+      long length;
+      length = ftell(file);
       fseek(file, 0, SEEK_SET);
 
       /* Allocate memory for the string, including the sapce added and null terminator*/
-      char *content = (char *)malloc(length + 2);
+      char *content;
+      content = (char *)malloc(length + 2);
       if (!content)
       {
          fclose(file);
@@ -149,13 +160,17 @@ struct Symbol
 };
 
 struct Symbol symbols[100];
-int indexSymbols = 0;
+int indexSymbols;
+indexSymbols = 0;
 
 int getSymbolIndex(char symbol[])
 {
-   int i = 0;
-   int i2 = 0;
-   int bol = TRUE;
+   int i;
+   i = 0;
+   int i2;
+   i2 = 0;
+   int bol;
+   bol = TRUE;
    for (i = 0; i < (sizeof(symbols) / sizeof(symbols[0])); i++)
    {
       if (strlen(symbols[i].name) == strlen(symbol))
@@ -288,7 +303,8 @@ struct Mcro
    char str[500];
 };
 struct Mcro mcros[100];
-int mcroIndex = 0;
+int mcroIndex;
+mcroIndex = 0;
 
 int isMcro(int i, char input[])
 {
@@ -302,12 +318,13 @@ int isMcro(int i, char input[])
    }
 }
 
+
 struct Mcro createMcro(int i, char input[])
 {
-   static struct Mcro m;
    i = jumpToEndOfWord(i, input);
    i = skipBlank(i, input);
-   int iname = 0;
+   int iname;
+   iname = 0;
    /*add mcro name*/
    while (input[i] != ' ')
    {
@@ -316,7 +333,8 @@ struct Mcro createMcro(int i, char input[])
       i++;
    }
 
-   int mindex = 0;
+   int mindex;
+   mindex = 0;
 
    while (!isWordMatch(i, "endmcro", input))
    {
@@ -404,8 +422,10 @@ int isDigit(char c)
 int toInt(char digits[])
 {
 
-   int bol = 1;
-   int skipIndex = 0;
+   int bol;
+   bol = 1;
+   int skipIndex;
+   skipIndex = 0;
 
    if (digits[0] == '-')
    {
@@ -413,7 +433,8 @@ int toInt(char digits[])
       skipIndex = 1;
    }
 
-   int num = 0;
+   int num;
+   num = 0;
    int index;
    for (index = skipIndex; index < strlen(digits); index++)
    {
@@ -494,7 +515,8 @@ int get_symbol_index(int itmp, char input[])
    /*find the symbol index*/
    int i2;
    char symbole_name[20];
-   int symbolen = jumpToEndOfWord(itmp, input) - itmp;
+   int symbolen;
+   symbolen = jumpToEndOfWord(itmp, input) - itmp;
    for (i2 = 0; i2 < symbolen; i2++)
    {
       symbole_name[i2] = input[itmp];
@@ -505,8 +527,10 @@ int get_symbol_index(int itmp, char input[])
 
    printf("%s", symbole_name);
    int j;
-   int bool = FALSE;
-   int tmpindex = -1;
+   int bool;
+   bool = FALSE;
+   int tmpindex;
+   tmpindex = -1;
    for (i2 = 0; i2 < (sizeof(symbols) / sizeof(symbols[0])); i2++)
    {
 
@@ -536,8 +560,10 @@ int get_symbol_address(int itmp, char input[])
 {
    /*find the symbol address*/
 
-   int tmpindex = get_symbol_index(itmp, input);
-   int symbol_address = symbols[tmpindex].address;
+   int tmpindex;
+   tmpindex = get_symbol_index(itmp, input);
+   int symbol_address;
+   symbol_address = symbols[tmpindex].address;
    return symbol_address;
 }
 
@@ -545,8 +571,10 @@ int get_symbol_address(int itmp, char input[])
 
 int isWordFromLettersOnly(char word[])
 {
-   int i = 0;
-   int len = strlen(word);
+   int i;
+   i = 0;
+   int len;
+   len = strlen(word);
 
    while (isLetter(word[i]) && i < len)
    {
@@ -596,19 +624,27 @@ int isCommaBetweenWords(int i, char input[])
 
 int isValidWord(int i, char input[])
 {
-   int isR = isValidRegister(i, input);
-   int isSymb = isSymbol(i, input);
-   int isDt = isData(i, input);
-   int isStr = isString(i, input);
-   int isEorE = isExternOrEntry(i, input);
+   int isR;
+   isR = isValidRegister(i, input);
+   int isSymb;
+   isSymb = isSymbol(i, input);
+   int isDt;
+   isDt = isData(i, input);
+   int isStr;
+   isStr = isString(i, input);
+   int isEorE;
+   isEorE = isExternOrEntry(i, input);
 
-   int iopcode = isOpCode(i, input);
+   int iopcode;
+   iopcode = isOpCode(i, input);
 
-   int itmp = i;
+   int itmp;
+   itmp = i;
 
    i = jumpToEndOfWord(i, input);
 
-   int wordLen = i - itmp;
+   int wordLen;
+   wordLen = i - itmp;
    char word[wordLen];
    int itmp2;
    for (itmp2 = 0; itmp2 < wordLen; itmp2++)
@@ -617,7 +653,8 @@ int isValidWord(int i, char input[])
       itmp++;
    }
 
-   int isNum = TRUE;
+   int isNum;
+   isNum = TRUE;
 
    for (itmp2 = 0; itmp2 < wordLen; itmp2++)
    {
@@ -647,13 +684,16 @@ int isSpaceAndOpcodeOrLabelDefAfterLastOperand(int i, char input[])
       return TRUE;
    }
 
-   int iopcode = isOpCode(i, input);
+   int iopcode;
+   iopcode = isOpCode(i, input);
 
-   int itmp = i;
+   int itmp;
+   itmp = i;
 
    i = jumpToEndOfWord(i, input);
 
-   int wordLen = i - itmp;
+   int wordLen;
+   wordLen = i - itmp;
    char word[wordLen];
    int itmp2;
    for (itmp2 = 0; itmp2 < wordLen; itmp2++)
@@ -686,16 +726,16 @@ int isSpaceAndOpcodeOrLabelDefAfterLastOperand(int i, char input[])
    }
 }
 
-
-
 int main()
 {
 
    printf("%s", "start main: ");
 
-   char *inputText = readFileToString("ps.as");
+   char *inputText;
+   inputText = readFileToString("ps.as");
    /*input index*/
-   int i = 0;
+   int i;
+   i = 0;
 
    /*create macros*/
    while (i < strlen(inputText))
@@ -725,7 +765,8 @@ int main()
    mcroIndex = 0;
 
    char newInput[2000];
-   int i2 = 0;
+   int i2;
+   i2 = 0;
 
    /*skip mcro code in new input text*/
    while (i < strlen(inputText))
@@ -771,8 +812,10 @@ int main()
          {
             printf("%s", "mcro found: ");
             printf("%s", mcros[mcroIndex].name);
-            int lentmp = strlen(mcros[mcroIndex].str);
-            int itmp = 0;
+            int lentmp;
+            lentmp = strlen(mcros[mcroIndex].str);
+            int itmp;
+            itmp = 0;
 
             while (itmp < lentmp)
             {
@@ -809,13 +852,15 @@ int main()
    i = 0;
 
    /*memory index*/
-   int mi = 100;
+   int mi;
+   mi = 100;
 
    while (i < strlen(newInput2))
    {
       printf("%c", ' ');
       i = skipBlank(i, newInput2);
-      int wasDataCase = FALSE;
+      int wasDataCase;
+      wasDataCase = FALSE;
 
       if (isExternOrEntry(i, newInput2))
       {
@@ -831,7 +876,8 @@ int main()
          if (isSymbol(i, newInput2))
          {
 
-            int cnt = i;
+            int cnt;
+            cnt = i;
             while (newInput2[cnt] != ' ')
             {
                cnt++;
@@ -860,7 +906,8 @@ int main()
                i += 3;
 
                /*get string length*/
-               int len = jumpToEndOfWord(i, newInput2) - 2 - i;
+               int len;
+               len = jumpToEndOfWord(i, newInput2) - 2 - i;
 
                /*count the memory for the string*/
                mi += len;
@@ -879,7 +926,8 @@ int main()
                   i = skipBlank(i, newInput2);
 
                   /*get all integers*/
-                  int bol = TRUE;
+                  int bol;
+                  bol = TRUE;
 
                   while (bol)
                   {
@@ -961,7 +1009,8 @@ int main()
          i = jumpToEndOfWord(i, newInput2);
          i = skipBlank(i, newInput2);
 
-         int tmpindex = get_symbol_index(i, newInput2);
+         int tmpindex;
+         tmpindex = get_symbol_index(i, newInput2);
          printf("%d", tmpindex);
 
          if (tmpindex != -1)
@@ -1007,10 +1056,13 @@ int main()
 
    int d_code[1000][12];
    int dindex = 100;
-   int isError = FALSE;
+   int isError;
+   isError = FALSE;
 
-   int cntCommends = 0;
-   int cntData = 0;
+   int cntCommends;
+   cntCommends = 0;
+   int cntData;
+   cntData = 0;
 
    while (i < strlen(newInput2))
    {
@@ -1040,7 +1092,8 @@ int main()
       }
 
       /*convert to binary*/
-      int iopcode = isOpCode(i, newInput2);
+      int iopcode;
+      iopcode = isOpCode(i, newInput2);
       if (iopcode != -1)
       {
 
@@ -1048,7 +1101,8 @@ int main()
          d_code[dindex][1] = 0;
 
          /*opcode case*/
-         int *binaryopcode = decimalToBinary(iopcode, 4);
+         int *binaryopcode;
+         binaryopcode = decimalToBinary(iopcode, 4);
 
          d_code[dindex][5] = binaryopcode[0];
          d_code[dindex][6] = binaryopcode[1];
@@ -1059,7 +1113,8 @@ int main()
          i = jumpToEndOfWord(i, newInput2);
          i = skipBlank(i, newInput2);
 
-         int opcode_group = get_opcode_group(iopcode);
+         int opcode_group;
+         opcode_group = get_opcode_group(iopcode);
          if (opcode_group == 1)
          {
             /*count for 2 operands*/
@@ -1071,10 +1126,12 @@ int main()
                /*count for data*/
                cntData++;
 
-               int *binary_opcode = decimalToBinary(iopcode, 4);
+               int *binary_opcode;
+               binary_opcode = decimalToBinary(iopcode, 4);
 
                int itmp;
-               int itmp2 = 0;
+               int itmp2;
+               itmp2 = 0;
 
                for (itmp = 5; itmp < 9; itmp++)
                {
@@ -1099,8 +1156,10 @@ int main()
                   i++;
                }
 
-               int n = toInt(strnum);
-               int *num = decimalToBinary(n, 10);
+               int n;
+               n = toInt(strnum);
+               int *num;
+               num = decimalToBinary(n, 10);
 
                itmp = 0;
                itmp2 = 2;
@@ -1135,7 +1194,8 @@ int main()
                   dindex += 2;
 
                   i += 2;
-                  int rnum = newInput2[i] - '0';
+                  int rnum;
+                  rnum = newInput2[i] - '0';
 
                   itmp = 0;
                   for (itmp = 0; itmp < 7; itmp++)
@@ -1143,7 +1203,8 @@ int main()
                      d_code[dindex][itmp] = 0;
                   }
 
-                  int *binarynum = decimalToBinary(rnum, 4);
+                  int *binarynum;
+                  binarynum = decimalToBinary(rnum, 4);
 
                   itmp2 = 0;
                   for (itmp = 7; itmp < 12; itmp++)
@@ -1160,9 +1221,11 @@ int main()
 
                   /*get to the third operand*/
                   dindex += 2;
-                  int itmp = i;
+                  int itmp;
+                  itmp = i;
                   i = jumpToEndOfWord(i, newInput2);
-                  int labelen = i - itmp;
+                  int labelen;
+                  labelen = i - itmp;
                   char label[labelen];
 
                   for (itmp2 = 0; itmp2 < labelen; itmp2++)
@@ -1171,8 +1234,10 @@ int main()
                      itmp++;
                   }
 
-                  int sindex = getSymbolIndex(label);
-                  int *num = decimalToBinary(symbols[sindex].address, 10);
+                  int sindex;
+                  sindex = getSymbolIndex(label);
+                  int *num;
+                  num = decimalToBinary(symbols[sindex].address, 10);
 
                   if (symbols[sindex].isExtern)
                   {
@@ -1210,7 +1275,8 @@ int main()
                }
 
                i += 2;
-               int rnum1 = newInput2[i] - '0';
+               int rnum1;
+               rnum1 = newInput2[i] - '0';
                /*get after register*/
                i++;
 
@@ -1239,7 +1305,8 @@ int main()
                   }
 
                   i += 2;
-                  int rnum2 = newInput2[i] - '0';
+                  int rnum2;
+                  rnum2 = newInput2[i] - '0';
                   /*get after register*/
                   i++;
 
@@ -1259,11 +1326,14 @@ int main()
                   d_code[dindex][0] = 0;
                   d_code[dindex][1] = 0;
 
-                  int *binaryRNum1 = decimalToBinary(rnum1, 5);
-                  int *binaryRNum2 = decimalToBinary(rnum2, 5);
+                  int *binaryRNum1;
+                  binaryRNum1 = decimalToBinary(rnum1, 5);
+                  int *binaryRNum2;
+                  binaryRNum2 = decimalToBinary(rnum2, 5);
 
                   int itmp;
-                  int itmp2 = 0;
+                  int itmp2;
+                  itmp2 = 0;
 
                   for (itmp = 2; itmp < 12; itmp++)
                   {
@@ -1292,10 +1362,12 @@ int main()
 
                   /*if the scond operand is a label*/
                   /*get label string*/
-                  int itmp = i;
+                  int itmp;
+                  itmp = i;
                   i = jumpToEndOfWord(i, newInput2);
 
-                  int labelen = i - itmp;
+                  int labelen;
+                  labelen = i - itmp;
                   char label[labelen];
                   int itmp2;
                   for (itmp2 = 0; itmp2 < labelen; itmp2++)
@@ -1321,7 +1393,8 @@ int main()
                   /*decode the register operand*/
                   dindex++;
                   itmp2 = 0;
-                  int *binaryRNum1 = decimalToBinary(rnum1, 5);
+                  int *binaryRNum1;
+                  binaryRNum1 = decimalToBinary(rnum1, 5);
                   for (itmp = 0; itmp < 12; itmp++)
                   {
                      if (itmp > 6 && itmp < 12)
@@ -1338,8 +1411,10 @@ int main()
                   /*decode the label operand*/
                   dindex++;
 
-                  int sindex = getSymbolIndex(label);
-                  int *num = decimalToBinary(symbols[sindex].address, 10);
+                  int sindex;
+                  sindex = getSymbolIndex(label);
+                  int *num;
+                  num = decimalToBinary(symbols[sindex].address, 10);
 
                   if (symbols[sindex].isExtern)
                   {
@@ -1374,7 +1449,8 @@ int main()
                d_code[dindex][11] = 0;
 
                /*get label string*/
-               int itmp = i;
+               int itmp;
+               itmp = i;
                i = jumpToEndOfWord(i, newInput2);
                i--;
 
@@ -1383,7 +1459,8 @@ int main()
                {
                   i--;
                }
-               int labelen = i - itmp;
+               int labelen;
+               labelen = i - itmp;
                char label[labelen];
                int itmp2;
                for (itmp2 = 0; itmp2 < labelen; itmp2++)
@@ -1409,8 +1486,10 @@ int main()
                   /*decode the label case*/
                   dindex++;
 
-                  int sindex = getSymbolIndex(label);
-                  int *num = decimalToBinary(symbols[sindex].address, 10);
+                  int sindex;
+                  sindex = getSymbolIndex(label);
+                  int *num;
+                  num = decimalToBinary(symbols[sindex].address, 10);
 
                   if (symbols[sindex].isExtern)
                   {
@@ -1436,8 +1515,10 @@ int main()
                   dindex++;
                   /*get register num*/
                   i += 2;
-                  int rnum = newInput2[i] - '0';
-                  int *binaryRNum = decimalToBinary(rnum, 4);
+                  int rnum;
+                  rnum = newInput2[i] - '0';
+                  int *binaryRNum;
+                  binaryRNum = decimalToBinary(rnum, 4);
 
                   d_code[dindex][2] = binaryRNum[0];
                   d_code[dindex][3] = binaryRNum[1];
@@ -1478,13 +1559,17 @@ int main()
                dindex++;
 
                i += 2;
-               int rnum = newInput2[i] - '0';
+               int rnum;
+               rnum = newInput2[i] - '0';
                /*get after register*/
                i++;
 
-               int *binaryRnum = decimalToBinary(rnum, 5);
-               int itmp = 0;
-               int itmp2 = 0;
+               int *binaryRnum;
+               binaryRnum = decimalToBinary(rnum, 5);
+               int itmp;
+               itmp = 0;
+               int itmp2;
+               itmp2 = 0;
 
                for (itmp = 0; itmp < 12; itmp++)
                {
@@ -1520,7 +1605,8 @@ int main()
                   d_code[dindex][1] = 0;
 
                   char strnum[10];
-                  int itmp = 0;
+                  int itmp;
+                  itmp = 0;
                   while (isDigit(newInput2[i]))
                   {
                      strnum[itmp] = newInput2[i];
@@ -1528,12 +1614,15 @@ int main()
                      i++;
                   }
 
-                  int num = toInt(strnum);
+                  int num;
+                  num = toInt(strnum);
 
-                  int *binaryNum = decimalToBinary(num, 10);
+                  int *binaryNum;
+                  binaryNum = decimalToBinary(num, 10);
 
                   itmp = 2;
-                  int itmp2 = 0;
+                  int itmp2;
+                  itmp2 = 0;
 
                   for (itmp = 2; itmp < 12; itmp++)
                   {
@@ -1555,9 +1644,11 @@ int main()
                   d_code[dindex][1] = 1;
 
                   /*get label string*/
-                  int itmp = i;
+                  int itmp;
+                  itmp = i;
                   i = jumpToEndOfWord(i, newInput2);
-                  int labelen = i - itmp;
+                  int labelen;
+                  labelen = i - itmp;
 
                   labelen++;
 
@@ -1571,8 +1662,10 @@ int main()
 
                   label[labelen - 1] = '\0';
 
-                  int sindex = getSymbolIndex(label);
-                  int *num = decimalToBinary(symbols[sindex].address, 10);
+                  int sindex;
+                  sindex = getSymbolIndex(label);
+                  int *num;
+                  num = decimalToBinary(symbols[sindex].address, 10);
 
                   if (symbols[sindex].isExtern)
                   {
@@ -1606,7 +1699,8 @@ int main()
             d_code[dindex][3] = 0;
             d_code[dindex][4] = 0;
 
-            int *binaryOpcode = decimalToBinary(iopcode, 4);
+            int *binaryOpcode;
+            binaryOpcode = decimalToBinary(iopcode, 4);
 
             d_code[dindex][5] = binaryOpcode[0];
             d_code[dindex][6] = binaryOpcode[1];
@@ -1617,7 +1711,8 @@ int main()
             d_code[dindex][10] = 0;
             d_code[dindex][11] = 0;
 
-            int i = jumpToEndOfWord(i, newInput2);
+            int i;
+            i = jumpToEndOfWord(i, newInput2);
          }
          dindex++;
 
@@ -1643,12 +1738,14 @@ int main()
          i = skipBlank(i, newInput2);
 
          /*get all integers*/
-         int bol = TRUE;
+         int bol;
+         bol = TRUE;
 
          while (bol)
          {
             char strnum[10];
-            int itmp = 0;
+            int itmp;
+            itmp = 0;
 
             while (isDigit(newInput2[i]))
             {
@@ -1660,9 +1757,11 @@ int main()
 
             strnum[itmp] = '\0';
 
-            int n = toInt(strnum);
+            int n;
+            n = toInt(strnum);
 
-            int *num = decimalToBinary(n, 12);
+            int *num;
+            num = decimalToBinary(n, 12);
 
             itmp = 0;
 
@@ -1714,11 +1813,14 @@ int main()
          i += 3;
 
          /*get string length*/
-         int len = jumpToEndOfWord(i, newInput2) - 2 - i;
+         int len;
+         len = jumpToEndOfWord(i, newInput2) - 2 - i;
 
          char str[len];
-         int itmp = 0;
-         int itmp2 = 0;
+         int itmp;
+         itmp = 0;
+         int itmp2;
+         itmp2 = 0;
 
          /*put string into str*/
          for (itmp = 0; itmp < len - 1; itmp++)
@@ -1738,7 +1840,8 @@ int main()
          /*decode string*/
          for (itmp = 0; itmp < len; itmp++)
          {
-            int *ascii = decimalToBinary(str[itmp], 12);
+            int *ascii ;
+            ascii = decimalToBinary(str[itmp], 12);
 
             for (itmp2 = 0; itmp2 < 12; itmp2++)
             {
@@ -1772,13 +1875,16 @@ int main()
    /* convert d_code binary array ro base64 letters:*/
    int y;
    int x;
-   int z = 11;
+   int z;
+   z = 11;
 
    /*revers d_code array*/
    for (y = 100; y < dindex; y++)
    {
-      int start = 0;
-      int end = 11;
+      int start;
+      start = 0;
+      int end;
+      end = 11;
       int temp;
       while (start < end)
       {
@@ -1806,7 +1912,8 @@ int main()
 
    for (y = 100; y < dindex; y++)
    {
-      char *strTmp = convertArrayToBase64(d_code[y]);
+      char *strTmp;
+      strTmp = convertArrayToBase64(d_code[y]);
 
       decodingResultStr[y][0] = strTmp[0];
       decodingResultStr[y][1] = strTmp[1];
@@ -1816,9 +1923,11 @@ int main()
       printf("%c", ' ');
    }
 
-   int slen = dindex;
+   int slen;
+   slen = dindex;
    char outputStr[slen];
-   int indexTmp = 0;
+   int indexTmp;
+   indexTmp = 0;
 
    char cnt1[10];
    /*convert int to string*/
@@ -1897,16 +2006,14 @@ int main()
 
    printf("Data written ent file\n");
 
-
    FILE *extfile;
-
 
    extfile = fopen("ps.ext", "w");
 
    if (extfile == NULL)
    {
       printf("Error opening the file!\n");
-      return 1; 
+      return 1;
    }
 
    for (i = 0; i < (sizeof(symbols) / sizeof(symbols[0])); i++)
