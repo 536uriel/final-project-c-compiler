@@ -7,7 +7,7 @@
 #define FALSE 0;
 #define TRUE 1;
 
-// Base64 character set
+/* Base64 character set*/
 char base64_chars[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
 char getBase64Char(int val)
@@ -16,26 +16,26 @@ char getBase64Char(int val)
    {
       return base64_chars[val];
    }
-   return ' '; // Error condition, you can handle it as you like.
+   return ' '; /* Error condition, you can handle it as you like.*/
 }
 
 char *convertArrayToBase64(int arr[12])
 {
    int first6 = 0, next6 = 0;
 
-   // Convert the first 6 cells into a single integer
+   /* Convert the first 6 cells into a single integer*/
    for (int i = 0; i < 6; i++)
    {
       first6 = (first6 << 1) | (arr[i] & 0x01);
    }
 
-   // Convert the next 6 cells into a single integer
+   /* Convert the next 6 cells into a single integer*/
    for (int i = 6; i < 12; i++)
    {
       next6 = (next6 << 1) | (arr[i] & 0x01);
    }
 
-   // Convert the two integers into Base64 characters
+   /* Convert the two integers into Base64 characters*/
    static char result[3];
    result[0] = getBase64Char(first6);
    result[1] = getBase64Char(next6);
@@ -53,13 +53,13 @@ int *decimalToBinary(int num, int array_size)
       exit(1);
    }
 
-   // Initialize the array to all zeros.
+   /* Initialize the array to all zeros.*/
    for (int i = 0; i < array_size; i++)
    {
       arr[i] = 0;
    }
 
-   // If the number is negative, calculate its 2's complement.
+   /* If the number is negative, calculate its 2's complement.*/
    if (num < 0)
    {
       num = -num; // Take the absolute value.
@@ -67,7 +67,7 @@ int *decimalToBinary(int num, int array_size)
       num += 1;   // Add 1.
    }
 
-   // Convert the number to binary and store it in the array.
+   /* Convert the number to binary and store it in the array.*/
    int index = 0;
    while (num && index < array_size)
    {
@@ -90,37 +90,37 @@ char *readFileToString(const char *filename)
    {
       printf("Current working directory: %s\n", cwd);
 
-      // If you have a file name, say "myfile.txt" in the current directory,
-      // you can create its full path as follows:
+      /* If you have a file name, say "myfile.txt" in the current directory,*/
+      /* you can create its full path as follows:*/
       char full_path[PATH_MAX + 1];
       snprintf(full_path, sizeof(full_path), "%s/%s", cwd, filename);
       printf("Full path: %s\n", full_path);
 
-      FILE *file = fopen(filename, "r"); // Open the file in read mode
+      FILE *file = fopen(filename, "r"); /* Open the file in read mode*/
       if (!file)
       {
          perror(filename);
-         return NULL; // If file does not exist, return NULL
+         return NULL; /* If file does not exist, return NULL*/
       }
 
-      // Determine the size of the file
+      /*Determine the size of the file*/
       fseek(file, 0, SEEK_END);
       long length = ftell(file);
       fseek(file, 0, SEEK_SET);
 
-      // Allocate memory for the string, including the sapce added and null terminator
+      /* Allocate memory for the string, including the sapce added and null terminator*/
       char *content = (char *)malloc(length + 2);
       if (!content)
       {
          fclose(file);
-         return NULL; // Failed to allocate memory
+         return NULL; /* Failed to allocate memory*/
       }
 
-      // Read the file into the allocated memory
+      /* Read the file into the allocated memory*/
       fread(content, 1, length, file);
       /*add spce to the end of content*/
       content[length] = ' ';
-      content[length + 1] = '\0'; // Null-terminate the string
+      content[length + 1] = '\0'; /* Null-terminate the string*/
 
       fclose(file);
       return content;
@@ -264,7 +264,6 @@ int isRegister(int i, char input[])
 int isSymbol(int i, char input[])
 {
 
-   /* to fix */
    while (input[i] != ' ' & i < strlen(input))
    {
       i++;
@@ -695,7 +694,7 @@ int main()
    /*input index*/
    int i = 0;
 
-   // /*create macros*/
+   /*create macros*/
    while (i < strlen(inputText))
    {
       i = skipBlank(i, inputText);
@@ -705,7 +704,7 @@ int main()
       if (isMcro(i, inputText))
       {
          printf("%s", "is mcro");
-         // /*jump after word mcro*/
+         /*jump after word mcro*/
          i = jumpToEndOfWord(i, inputText);
 
          mcros[mcroIndex] = createMcro(i, inputText);
@@ -936,7 +935,6 @@ int main()
    }
    indexSymbols = 0;
 
-   /*to fix:*/
    /*define if symbol is external or not*/
 
    /*first define any symbol to not external by default*/
@@ -993,14 +991,14 @@ int main()
 
    /* until here its first level of the compliler */
 
-   // /*until here summery:
-   // we created array of symbol with there names and addresses
-   // and we created macros  instances and replaced the instance
-   // with the insider code*/
+   /*until here summery:
+   we created array of symbol with there names and addresses
+   and we created macros  instances and replaced the instance
+   with the insider code*/
 
-   // /*new code here****************************************** */
+   /*new code here****************************************** */
 
-   // /* convert newinput to binary and check for errors: */
+   /* convert newinput to binary and check for errors: */
 
    i = 0;
 
@@ -1820,11 +1818,11 @@ int main()
    int indexTmp = 0;
 
    char cnt1[10];
-   // /*convert int to string*/
+   /*convert int to string*/
    sprintf(cnt1, "%d", cntCommends);
 
    char cnt2[10];
-   // /*convert int to string*/
+   /*convert int to string*/
    sprintf(cnt2, "%d", cntData);
 
    for (y = 100; y < dindex; y++)
@@ -1836,45 +1834,44 @@ int main()
       outputStr[indexTmp] = '\n';
       indexTmp++;
    }
-   // Pointer to the file
+   /*Pointer to the file*/
    FILE *file;
 
-   // Open a file in write mode. If the file doesn't exist, it will be created.
-   // If it exists, its contents will be overwritten.
+   /*Open a file in write mode. If the file doesn't exist, it will be created.
+   If it exists, its contents will be overwritten.*/
    file = fopen("ps.ob", "w");
 
-   // Check if the file was opened successfully
+   /* Check if the file was opened successfully*/
    if (file == NULL)
    {
       printf("Error opening the file!\n");
-      return 1; // Return an error code
+      return 1; /* Return an error code*/
    }
 
-   // Write some text to the file
+   /* Write some text to the file*/
    fprintf(file, cnt1);
    fprintf(file, " ");
    fprintf(file, cnt2);
    fprintf(file, "\n");
    fprintf(file, outputStr);
 
-   // Close the file
+   /* Close the file*/
    fclose(file);
 
    printf("Data written to ps.ob\n");
 
-   // Pointer to the file
+   /* Pointer to the file*/
    FILE *entfile;
 
-   // Open a file in write mode. If the file doesn't exist, it will be created.
-   // If it exists, its contents will be overwritten.
+   /*Open a file in write mode. If the file doesn't exist, it will be created.
+   If it exists, its contents will be overwritten.*/
    entfile = fopen("ps.ent", "w");
-   // extfile = fopen("ps.ext", "w");
 
-   // Check if the file was opened successfully
+   /* Check if the file was opened successfully*/
    if (entfile == NULL)
    {
       printf("Error opening the file!\n");
-      return 1; // Return an error code
+      return 1; /* Return an error code*/
    }
 
    for (i = 0; i < (sizeof(symbols) / sizeof(symbols[0])); i++)
@@ -1882,7 +1879,6 @@ int main()
       if (symbols[i].isEntry)
       {
          printf("%s", "entry case");
-         // Write some text to the file
          fprintf(entfile, symbols[i].name);
          fprintf(entfile, " ");
          char address[10];
@@ -1893,7 +1889,7 @@ int main()
       }
    }
 
-   // Close the files
+   /* Close the files*/
    fclose(entfile);
 
    printf("Data written ent file\n");
@@ -1901,16 +1897,13 @@ int main()
    // Pointer to the file
    FILE *extfile;
 
-   // Open a file in write mode. If the file doesn't exist, it will be created.
-   // If it exists, its contents will be overwritten.
-   extfile = fopen("ps.ext", "w");
-   // extfile = fopen("ps.ext", "w");
 
-   // Check if the file was opened successfully
+   extfile = fopen("ps.ext", "w");
+
    if (extfile == NULL)
    {
       printf("Error opening the file!\n");
-      return 1; // Return an error code
+      return 1; 
    }
 
    for (i = 0; i < (sizeof(symbols) / sizeof(symbols[0])); i++)
@@ -1918,18 +1911,16 @@ int main()
       if (symbols[i].isExtern)
       {
          printf("%s", "extern case");
-         // Write some text to the file
          fprintf(extfile, symbols[i].name);
          fprintf(extfile, " ");
          char address[10];
-         // /*convert int to string*/
+         /*convert int to string*/
          sprintf(address, "%d", symbols[i].address);
          fprintf(extfile, address);
          fprintf(extfile, "\n");
       }
    }
 
-   // Close the files
    fclose(extfile);
 
    printf("Data written ext file\n");
