@@ -812,101 +812,115 @@ int main()
    while (i < strlen(newInput2))
    {
       printf("%c", ' ');
-
+      i = skipBlank(i, newInput2);
       int wasDataCase = FALSE;
 
-      i = skipBlank(i, newInput2);
-
-      if (isSymbol(i, newInput2))
+      if (isExternOrEntry(i, newInput2))
       {
+         i = jumpToEndOfWord(i, newInput2);
+         i = skipBlank(i, newInput2);
 
-         int cnt = i;
-         while (newInput2[cnt] != ' ')
-         {
-            cnt++;
-         }
-
-         int j;
-         /*cnt - i => the length of the symbol word*/
-         for (j = 0; j < cnt - i - 1; j++)
-         {
-            symbols[indexSymbols].name[j] = newInput2[i + j];
-         }
-
-         symbols[indexSymbols].address = mi;
-         indexSymbols++;
+         i = jumpToEndOfWord(i, newInput2);
+         i = skipBlank(i, newInput2);
       }
       else
       {
-         if (isString(i, newInput2))
+
+         if (isSymbol(i, newInput2))
          {
-            /*get to string word*/
-            i = jumpToEndOfWord(i, newInput2);
-            i = skipBlank(i, newInput2);
-            /*skip "*/
-            i += 3;
 
-            /*get string length*/
-            int len = jumpToEndOfWord(i, newInput2) - 2 - i;
+            int cnt = i;
+            while (newInput2[cnt] != ' ')
+            {
+               cnt++;
+            }
 
-            /*count the memory for the string*/
-            mi += len;
+            int j;
+            /*cnt - i => the length of the symbol word*/
+            for (j = 0; j < cnt - i - 1; j++)
+            {
+               symbols[indexSymbols].name[j] = newInput2[i + j];
+            }
+
+            symbols[indexSymbols].address = mi;
+            indexSymbols++;
          }
          else
          {
             printf("%c", ' ');
-
-            if (isData(i, newInput2))
+            if (isString(i, newInput2))
             {
 
-               /*skip .data word */
+               /*get to string word*/
                i = jumpToEndOfWord(i, newInput2);
                i = skipBlank(i, newInput2);
+               /*skip "*/
+               i += 3;
 
-               /*get all integers*/
-               int bol = TRUE;
+               /*get string length*/
+               int len = jumpToEndOfWord(i, newInput2) - 2 - i;
 
-               while (bol)
-               {
-                  /*to fix*/
-                  if (isDigit(newInput2[i]))
-                  {
-                     /*count the memory for the numbers*/
-                     mi++;
-                  }
-                  while (isDigit(newInput2[i]))
-                  {
-                     i++;
-                  }
-
-                  i = skipBlank(i, newInput2);
-                  if (inputText[i] == ',')
-                  {
-                     i++;
-                     i = skipBlank(i, newInput2);
-                  }
-                  else
-                  {
-                     bol = FALSE;
-                     wasDataCase = TRUE;
-                  }
-               }
+               /*count the memory for the string*/
+               mi += len;
+               printf("%d", len);
+               printf("%s", " - len ");
             }
             else
             {
-               if (!is_r_to_r_case(i, newInput2))
+               printf("%c", ' ');
+
+               if (isData(i, newInput2))
                {
-                  mi++;
+
+                  /*skip .data word */
+                  i = jumpToEndOfWord(i, newInput2);
+                  i = skipBlank(i, newInput2);
+
+                  /*get all integers*/
+                  int bol = TRUE;
+
+                  while (bol)
+                  {
+                     /*to fix*/
+                     if (isDigit(newInput2[i]))
+                     {
+                        /*count the memory for the numbers*/
+                        mi++;
+                     }
+                     while (isDigit(newInput2[i]))
+                     {
+                        i++;
+                     }
+
+                     i = skipBlank(i, newInput2);
+                     if (inputText[i] == ',')
+                     {
+                        i++;
+                        i = skipBlank(i, newInput2);
+                     }
+                     else
+                     {
+                        bol = FALSE;
+                        wasDataCase = TRUE;
+                     }
+                  }
+               }
+               else
+               {
+                  if (!is_r_to_r_case(i, newInput2))
+                  {
+                     mi++;
+                  }
                }
             }
          }
-      }
 
-      if (!wasDataCase)
-      {
-         i = jumpToEndOfWord(i, newInput2);
+         if (!wasDataCase)
+         {
+            i = jumpToEndOfWord(i, newInput2);
+         }
+         wasDataCase = FALSE;
       }
-      wasDataCase = FALSE;
    }
 
    i = 0;
@@ -1004,7 +1018,7 @@ int main()
 
       if (isExternOrEntry(i, newInput2))
       {
-         /*count the first operand and data of .data*/
+         /*count the first operand and data of data*/
          cntCommends++;
          cntData++;
 
@@ -1822,9 +1836,6 @@ int main()
       outputStr[indexTmp] = '\n';
       indexTmp++;
    }
-
-   outputStr[indexTmp] = EOF;
-
    // Pointer to the file
    FILE *file;
 
@@ -1841,7 +1852,9 @@ int main()
 
    // Write some text to the file
    fprintf(file, cnt1);
+   fprintf(file, " ");
    fprintf(file, cnt2);
+   fprintf(file, "\n");
    fprintf(file, outputStr);
 
    // Close the file
