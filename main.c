@@ -45,7 +45,7 @@ char *intToStr(int num, char *str)
    i = 0;
    isNegative = FALSE;
 
-   // Handle 0 explicitly, otherwise empty string is returned
+   /* Handle 0 explicitly, otherwise empty string is returned*/
    if (num == 0)
    {
       str[i++] = '0';
@@ -53,30 +53,30 @@ char *intToStr(int num, char *str)
       return str;
    }
 
-   // Handle negative numbers only if num is negative
+   /* Handle negative numbers only if num is negative*/
    if (num < 0)
    {
       isNegative = TRUE;
       num = -num;
    }
 
-   // Process individual digits
+   /* Process individual digits*/
    while (num != 0)
    {
       rem = num % 10;
-      str[i++] = rem + '0'; // Convert the remainder to char and store
+      str[i++] = rem + '0'; /* Convert the remainder to char and store*/
       num = num / 10;
    }
 
-   // Append negative sign for negative numbers
+   /* Append negative sign for negative numbers*/
    if (isNegative)
    {
       str[i++] = '-';
    }
 
-   str[i] = '\0'; // Null-terminate string
+   str[i] = '\0'; 
 
-   // Reverse the string
+   /* Reverse the string*/
    reverse(str, i);
 
    return str;
@@ -160,6 +160,26 @@ int *decimalToBinary(int num, int array_size)
    return arr;
 }
 
+
+void concat_path(char *fullpath, const char *dir, const char *filename) {
+    /* Clear the buffer*/
+    fullpath[0] = '\0';
+    
+    /* Add directory to fullpath*/
+    strcat(fullpath, dir);
+
+    /* Check if the directory path ends with a separator, if not add one*/
+    size_t len = strlen(fullpath);
+    if (len > 0 && (fullpath[len-1] != '/' && fullpath[len-1] != '\\')) {
+        /* Here I'm using '/', which is common for UNIX-like systems
+         If you're targeting Windows, you might want to use '\\'. */
+        strcat(fullpath, "/");
+    }
+
+    /* Add filename to fullpath*/
+    strcat(fullpath, filename);
+}
+
 char *readFileToString(const char *filename)
 {
 
@@ -181,7 +201,7 @@ char *readFileToString(const char *filename)
       /* If you have a file name, say "myfile.txt" in the current directory,*/
       /* you can create its full path as follows:*/
 
-      snprintf(full_path, sizeof(full_path), "%s/%s", cwd, filename);
+      concat_path(full_path,cwd,filename);
       printf("Full path: %s\n", full_path);
 
       FILE *file;
