@@ -6,14 +6,81 @@
 
 #define FALSE 0;
 #define TRUE 1;
-int path_max = 1024;
 
 char result[3];
 struct Mcro m;
 
+char opcode[16][4] = {
+    "mov", "cmp", "add", "sub", "lea",
+    "not", "clr", "inc", "dec", "jmp", "bne", "red", "prn", "jsr",
+    "rts", "stop"};
 
 /* Base64 character set*/
 char base64_chars[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+
+void reverse(char str[], int length)
+{
+   int start;
+   int end;
+   char temp;
+
+   start = 0;
+   end = length - 1;
+   while (start < end)
+   {
+      temp = str[start];
+      str[start] = str[end];
+      str[end] = temp;
+      start++;
+      end--;
+   }
+}
+
+char *intToStr(int num, char *str)
+{
+   int i;
+   int isNegative;
+   int rem;
+
+   i = 0;
+   isNegative = FALSE;
+
+   // Handle 0 explicitly, otherwise empty string is returned
+   if (num == 0)
+   {
+      str[i++] = '0';
+      str[i] = '\0';
+      return str;
+   }
+
+   // Handle negative numbers only if num is negative
+   if (num < 0)
+   {
+      isNegative = TRUE;
+      num = -num;
+   }
+
+   // Process individual digits
+   while (num != 0)
+   {
+      rem = num % 10;
+      str[i++] = rem + '0'; // Convert the remainder to char and store
+      num = num / 10;
+   }
+
+   // Append negative sign for negative numbers
+   if (isNegative)
+   {
+      str[i++] = '-';
+   }
+
+   str[i] = '\0'; // Null-terminate string
+
+   // Reverse the string
+   reverse(str, i);
+
+   return str;
+}
 
 char getBase64Char(int val)
 {
@@ -27,10 +94,10 @@ char getBase64Char(int val)
 char *convertArrayToBase64(int arr[12])
 {
    int first6;
-   first6 = 0;
    int next6;
-   next6 = 0;
    int i;
+   first6 = 0;
+   next6 = 0;
 
    /* Convert the first 6 cells into a single integer*/
    for (i = 0; i < 6; i++)
@@ -55,8 +122,11 @@ char *convertArrayToBase64(int arr[12])
 int *decimalToBinary(int num, int array_size)
 {
    int *arr;
-   arr = (int *)malloc(sizeof(int) * array_size);
    int i;
+   int index;
+
+   arr = (int *)malloc(sizeof(int) * array_size);
+
    if (!arr)
    {
       perror("Failed to allocate memory");
@@ -78,7 +148,7 @@ int *decimalToBinary(int num, int array_size)
    }
 
    /* Convert the number to binary and store it in the array.*/
-   int index;
+
    index = 0;
    while (num && index < array_size)
    {
@@ -94,16 +164,23 @@ char *readFileToString(const char *filename)
 {
 
    char *cwd;
-   char buff[(path_max + 1)];
+   char buff[1024];
+   char full_path[1024];
+   long length;
+   char *content;
+   int tmp;
+   int path_max;
 
-   cwd = getcwd(buff, path_max + 1);
+   path_max = 1024;
+
+   cwd = getcwd(buff, path_max);
    if (cwd != NULL)
    {
       printf("Current working directory: %s\n", cwd);
 
       /* If you have a file name, say "myfile.txt" in the current directory,*/
       /* you can create its full path as follows:*/
-      char full_path[path_max + 1];
+
       snprintf(full_path, sizeof(full_path), "%s/%s", cwd, filename);
       printf("Full path: %s\n", full_path);
 
@@ -117,12 +194,12 @@ char *readFileToString(const char *filename)
 
       /*Determine the size of the file*/
       fseek(file, 0, SEEK_END);
-      long length;
+
       length = ftell(file);
       fseek(file, 0, SEEK_SET);
 
       /* Allocate memory for the string, including the sapce added and null terminator*/
-      char *content;
+
       content = (char *)malloc(length + 2);
       if (!content)
       {
@@ -134,7 +211,8 @@ char *readFileToString(const char *filename)
       fread(content, 1, length, file);
       /*add spce to the end of content*/
       content[length] = ' ';
-      content[length + 1] = '\0'; /* Null-terminate the string*/
+      tmp = length + 1;
+      content[tmp] = '\0'; /* Null-terminate the string*/
 
       fclose(file);
       return content;
@@ -145,11 +223,6 @@ char *readFileToString(const char *filename)
       exit(0);
    }
 }
-
-char opcode[16][4] = {
-    "mov", "cmp", "add", "sub", "lea",
-    "not", "clr", "inc", "dec", "jmp", "bne", "red", "prn", "jsr",
-    "rts", "stop"};
 
 struct Symbol
 {
@@ -317,7 +390,6 @@ int isMcro(int i, char input[])
       return FALSE;
    }
 }
-
 
 struct Mcro createMcro(int i, char input[])
 {
@@ -1840,7 +1912,7 @@ int main()
          /*decode string*/
          for (itmp = 0; itmp < len; itmp++)
          {
-            int *ascii ;
+            int *ascii;
             ascii = decimalToBinary(str[itmp], 12);
 
             for (itmp2 = 0; itmp2 < 12; itmp2++)
@@ -1929,13 +2001,13 @@ int main()
    int indexTmp;
    indexTmp = 0;
 
-   char cnt1[10];
    /*convert int to string*/
-   sprintf(cnt1, "%d", cntCommends);
+   char cnt1tmp[10];
+   char *cnt1 = intToStr(cntCommends, cnt1tmp);
 
-   char cnt2[10];
    /*convert int to string*/
-   sprintf(cnt2, "%d", cntData);
+   char cnt2tmp[10];
+   char *cnt2 = intToStr(cntData, cnt2tmp);
 
    for (y = 100; y < dindex; y++)
    {
@@ -1993,9 +2065,9 @@ int main()
          printf("%s", "entry case");
          fprintf(entfile, symbols[i].name);
          fprintf(entfile, " ");
-         char address[10];
          /*convert int to string*/
-         sprintf(address, "%d", symbols[i].address);
+         char tmpaddress[10];
+         char *address = intToStr(symbols[i].address, tmpaddress);
          fprintf(entfile, address);
          fprintf(entfile, "\n");
       }
@@ -2023,9 +2095,9 @@ int main()
          printf("%s", "extern case");
          fprintf(extfile, symbols[i].name);
          fprintf(extfile, " ");
-         char address[10];
          /*convert int to string*/
-         sprintf(address, "%d", symbols[i].address);
+         char tmpaddress[10];
+         char *address = intToStr(symbols[i].address, tmpaddress);
          fprintf(extfile, address);
          fprintf(extfile, "\n");
       }
