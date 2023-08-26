@@ -365,24 +365,6 @@ int isOpCode(int i, char input[])
    return -1;
 }
 
-int isRegister(int i, char input[])
-{
-   int x;
-   char buff[4];
-   for (x = 1; x <= 8; x++)
-   {
-
-      /*connect int x to string buff*/
-      snprintf("@r%d", 4, x);
-      if (isWordMatch(i, buff, input) == 1)
-      {
-         return x;
-      }
-   }
-
-   return -1;
-}
-
 int isSymbol(int i, char input[])
 {
 
