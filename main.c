@@ -226,7 +226,7 @@ char *readFileToString(const char *filename)
       concat_path(full_path, cwd, filename);
       printf("Full path: %s\n", full_path);
 
-      file = fopen(filename, "r"); /* Open the file in read mode*/
+      file = fopen(full_path, "r"); /* Open the file in read mode*/
       if (!file)
       {
          perror(filename);
