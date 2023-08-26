@@ -179,7 +179,7 @@ int *decimalToBinary(int num, int array_size)
    return arr;
 }
 
-void concat_path(char *fullpath, const char *dir, const char *filename)
+void concat_path(char *fullpath, const char *dir, char *filename)
 {
    size_t len;
    /* Clear the buffer*/
@@ -201,12 +201,12 @@ void concat_path(char *fullpath, const char *dir, const char *filename)
    strcat(fullpath, filename);
 }
 
-char *readFileToString(const char *filename)
+char *readFileToString(char *filename)
 {
 
    char *cwd;
    char buff[1024];
-   char full_path[1024];
+   char *full_path;
    long length;
    char *content;
    int tmp;
@@ -214,6 +214,7 @@ char *readFileToString(const char *filename)
    FILE *file;
 
    path_max = 1024;
+   full_path = (char *)malloc(1024 * sizeof(char));
 
    cwd = getcwd(buff, path_max);
    if (cwd != NULL)
@@ -227,6 +228,7 @@ char *readFileToString(const char *filename)
       printf("Full path: %s\n", full_path);
 
       file = fopen(full_path, "r"); /* Open the file in read mode*/
+
       if (!file)
       {
          perror(filename);
@@ -254,7 +256,6 @@ char *readFileToString(const char *filename)
       content[length] = ' ';
       tmp = length + 1;
       content[tmp] = '\0'; /* Null-terminate the string*/
-
       fclose(file);
       return content;
    }
@@ -339,13 +340,17 @@ int isWordMatch(int i, char word[], char input[])
          return FALSE;
       }
 
-      if (index == strlen(word))
-      {
-
-         return TRUE;
-      }
-
       i++;
+   }
+
+   if (index == strlen(word))
+   {
+
+      return TRUE;
+   }
+   else
+   {
+      return FALSE;
    }
 }
 
@@ -368,7 +373,7 @@ int isOpCode(int i, char input[])
 int isSymbol(int i, char input[])
 {
 
-   while (input[i] != ' ' & i < strlen(input))
+   while ((input[i] != ' ') && (i < strlen(input)))
    {
       i++;
    }
@@ -486,7 +491,7 @@ int isEntry(int i, char input[])
 
 int isDigit(char c)
 {
-   if (c >= '0' && c <= '9' || c == '-')
+   if ((c >= '0') && (c <= '9' || c == '-'))
    {
       return TRUE;
    }
@@ -587,6 +592,8 @@ int get_opcode_group(int iopcode)
    {
       return 3;
    }
+
+   return FALSE;
 }
 
 int get_symbol_index(int itmp, char input[])
@@ -732,7 +739,7 @@ int isValidWord(int i, char input[])
    i = jumpToEndOfWord(i, input);
 
    wordLen = i - itmp;
-   word = (int *)malloc(wordLen * sizeof(int));
+   word = (char *)malloc(wordLen * sizeof(char));
 
    for (itmp2 = 0; itmp2 < wordLen; itmp2++)
    {
@@ -834,6 +841,7 @@ int main()
    int len;
    int bol;
    int tmpindex;
+   int iopcode;
 
    int d_code[1000][12];
    int dindex = 100;
@@ -863,7 +871,6 @@ int main()
    int *ascii;
    int y;
    int x;
-   int z;
    int start;
    int end;
    char *strTmp;
@@ -1227,7 +1234,7 @@ int main()
       }
 
       /*convert to binary*/
-      int iopcode;
+
       iopcode = isOpCode(i, newInput2);
       if (iopcode != -1)
       {
@@ -1952,14 +1959,12 @@ int main()
 
    /* convert d_code binary array ro base64 letters:*/
 
-   z = 11;
-
    /*revers d_code array*/
    for (y = 100; y < dindex; y++)
    {
       start = 0;
       end = 11;
-      temp;
+
       while (start < end)
       {
          temp = d_code[y][start];
@@ -1996,7 +2001,7 @@ int main()
 
    len = dindex;
    outputStr = (char *)malloc(sizeof(char) * len);
-   ;
+
    indexTmp = 0;
 
    /*convert int to string*/
@@ -2030,11 +2035,11 @@ int main()
    }
 
    /* Write some text to the file*/
-   fprintf(file, cnt1);
-   fprintf(file, " ");
-   fprintf(file, cnt2);
-   fprintf(file, "\n");
-   fprintf(file, outputStr);
+   fputs(cnt1, file);
+   fputs(" ", file);
+   fputs(cnt2, file);
+   fputs("\n", file);
+   fputs(outputStr, file);
 
    /* Close the file*/
    fclose(file);
@@ -2059,13 +2064,13 @@ int main()
       if (symbols[i].isEntry)
       {
          printf("%s", "entry case");
-         fprintf(entfile, symbols[i].name);
-         fprintf(entfile, " ");
+         fputs(symbols[i].name, entfile);
+         fputs(" ", entfile);
          /*convert int to string*/
          tmpaddress = (char *)malloc(sizeof(char) * 10);
          address = intToStr(symbols[i].address, tmpaddress);
-         fprintf(entfile, address);
-         fprintf(entfile, "\n");
+         fputs(address, entfile);
+         fputs("\n", entfile);
       }
    }
 
@@ -2087,13 +2092,13 @@ int main()
       if (symbols[i].isExtern)
       {
          printf("%s", "extern case");
-         fprintf(extfile, symbols[i].name);
-         fprintf(extfile, " ");
+         fputs(symbols[i].name, extfile);
+         fputs(" ", extfile);
          /*convert int to string*/
          tmpaddress = (char *)malloc(sizeof(char) * 10);
          address = intToStr(symbols[i].address, tmpaddress);
-         fprintf(extfile, address);
-         fprintf(extfile, "\n");
+         fputs(address, extfile);
+         fputs("\n", extfile);
       }
    }
 
