@@ -884,6 +884,21 @@ int main()
    int z;
    int start;
    int end;
+   char *strTmp;
+   char *outputStr;
+   int indexTmp;
+   char *cnt1tmp;
+   char *cnt2tmp;
+   char *cnt1;
+   char *cnt2;
+   int temp;
+   char decodingResultStr[1000][2];
+   char *tmpaddress;
+   char *address;
+
+   FILE *file;
+   FILE *entfile;
+   FILE *extfile;
 
    printf("%s", "start main: ");
 
@@ -1845,7 +1860,6 @@ int main()
 
             n = toInt(strnum);
 
-            int *num;
             num = decimalToBinary(n, 12);
 
             itmp = 0;
@@ -1901,7 +1915,7 @@ int main()
          len = jumpToEndOfWord(i, newInput2) - 2 - i;
 
          str = (char *)malloc(len * sizeof(char));
-         ;
+
          itmp = 0;
          itmp2 = 0;
 
@@ -1963,7 +1977,7 @@ int main()
    {
       start = 0;
       end = 11;
-      int temp;
+      temp;
       while (start < end)
       {
          temp = d_code[y][start];
@@ -1986,11 +2000,8 @@ int main()
       printf("%c", ' ');
    }
 
-   char decodingResultStr[dindex][2];
-
    for (y = 100; y < dindex; y++)
    {
-      char *strTmp;
       strTmp = convertArrayToBase64(d_code[y]);
 
       decodingResultStr[y][0] = strTmp[0];
@@ -2001,19 +2012,18 @@ int main()
       printf("%c", ' ');
    }
 
-   int slen;
-   slen = dindex;
-   char outputStr[slen];
-   int indexTmp;
+   len = dindex;
+   outputStr = (char *)malloc(sizeof(char) * len);
+   ;
    indexTmp = 0;
 
    /*convert int to string*/
-   char cnt1tmp[10];
-   char *cnt1 = intToStr(cntCommends, cnt1tmp);
+   cnt1tmp = (char *)malloc(sizeof(char) * 10);
+   cnt1 = intToStr(cntCommends, cnt1tmp);
 
    /*convert int to string*/
-   char cnt2tmp[10];
-   char *cnt2 = intToStr(cntData, cnt2tmp);
+   cnt2tmp = (char *)malloc(sizeof(char) * 10);
+   cnt2 = intToStr(cntData, cnt2tmp);
 
    for (y = 100; y < dindex; y++)
    {
@@ -2025,7 +2035,6 @@ int main()
       indexTmp++;
    }
    /*Pointer to the file*/
-   FILE *file;
 
    /*Open a file in write mode. If the file doesn't exist, it will be created.
    If it exists, its contents will be overwritten.*/
@@ -2051,7 +2060,6 @@ int main()
    printf("Data written to ps.ob\n");
 
    /* Pointer to the file*/
-   FILE *entfile;
 
    /*Open a file in write mode. If the file doesn't exist, it will be created.
    If it exists, its contents will be overwritten.*/
@@ -2072,8 +2080,8 @@ int main()
          fprintf(entfile, symbols[i].name);
          fprintf(entfile, " ");
          /*convert int to string*/
-         char tmpaddress[10];
-         char *address = intToStr(symbols[i].address, tmpaddress);
+         tmpaddress = (char *)malloc(sizeof(char) * 10);
+         address = intToStr(symbols[i].address, tmpaddress);
          fprintf(entfile, address);
          fprintf(entfile, "\n");
       }
@@ -2083,8 +2091,6 @@ int main()
    fclose(entfile);
 
    printf("Data written ent file\n");
-
-   FILE *extfile;
 
    extfile = fopen("ps.ext", "w");
 
@@ -2102,8 +2108,8 @@ int main()
          fprintf(extfile, symbols[i].name);
          fprintf(extfile, " ");
          /*convert int to string*/
-         char tmpaddress[10];
-         char *address = intToStr(symbols[i].address, tmpaddress);
+         tmpaddress = (char *)malloc(sizeof(char) * 10);
+         address = intToStr(symbols[i].address, tmpaddress);
          fprintf(extfile, address);
          fprintf(extfile, "\n");
       }
